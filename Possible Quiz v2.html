@@ -1,0 +1,2665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>the possible quiz 3 - system OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=EB+Garamond:wght@400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style type="text/tailwindcss">
+        :root {
+            --vintage-cream: #f2e8cf;
+            --vintage-red: #bc4749;
+            --vintage-green: #6a994e;
+            --vintage-dark: #386641;
+            --vintage-ink: #2b2d42;
+            --paper-texture: url('https://www.transparenttextures.com/patterns/p6.png');
+            --accent-color: #bc4749;
+            --bg-gradient: linear-gradient(135deg, #a3b18a 0%, #3a5a40 100%);
+            --bg-gradient-orange: linear-gradient(135deg, #d97706 0%, #92400e 100%);
+            --bg-gradient-violet: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --bg-gradient-won: linear-gradient(135deg, #001f3f 0%, #004080 50%, #00e5ff 100%);
+            --nav-height: 60px;
+            --win-bg: #f2e8cf;
+            --win-text: #2b2d42;
+            --win-border: #2b2d42;
+        }
+
+        .dark-mode {
+            --vintage-cream: #1a1a1a;
+            --vintage-ink: #f2e8cf;
+            --win-bg: #2d2d2d;
+            --win-text: #e0e0e0;
+            --win-border: #000;
+            --bg-gradient: linear-gradient(135deg, #121212 0%, #000000 100%);
+        }
+
+        .transcendence-mode {
+            --bg-gradient: linear-gradient(135deg, #001f3f 0%, #004080 50%, #00e5ff 100%);
+            --win-bg: #e0f2fe;
+            --win-text: #000;
+            --win-border: #0369a1;
+        }
+
+        .transcendence-mode .minimalist-button {
+            box-shadow: -3px -3px 0px #0369a1;
+            border-radius: 20px;
+        }
+
+        body {
+            background: #2b2d42;
+            color: var(--vintage-ink);
+            font-family: 'EB Garamond', serif;
+            overflow: hidden;
+            height: 100dvh;
+            width: 100vw;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+            position: fixed;
+            transition: background 0.3s;
+        }
+
+        #desktop {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-gradient);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            z-index: 1;
+            transition: background 1.5s ease-in-out;
+            overflow: hidden;
+        }
+
+        #desktop::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: var(--paper-texture);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .desktop-icon {
+            width: 80px;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.1s, opacity 0.5s;
+            z-index: 2;
+            touch-action: none;
+            position: absolute;
+        }
+        .desktop-icon:active { transform: scale(0.9); }
+        .desktop-icon.dragging { opacity: 0.8; transition: none; transform: scale(1.05); cursor: move; z-index: 1000; }
+        
+        .icon-box {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 2px solid #2b2d42;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+
+        .desktop-icon span { 
+            font-size: 11px; 
+            font-weight: bold; 
+            background: rgba(242, 232, 207, 0.9); 
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: 'Special Elite', monospace;
+            border: 1px solid #2b2d42;
+            color: #2b2d42;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 45px;
+            background: #2b2d42;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            z-index: 2000;
+            border-top: 2px solid #000;
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-height);
+            background: #1a1a1a;
+            z-index: 5000;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #333;
+        }
+
+        .nav-btn {
+            color: white;
+            opacity: 0.8;
+            padding: 10px;
+            transition: transform 0.1s;
+        }
+        .nav-btn:active { transform: scale(1.2); }
+
+        @media (max-width: 768px) {
+            .taskbar { display: none; }
+            .mobile-nav { display: flex; }
+            #desktop { padding-bottom: 80px; display: block; }
+            #desktop-settings-icon { display: flex !important; }
+        }
+
+        #desktop-settings-icon { display: none; }
+
+        @media (max-width: 768px) and (orientation: portrait) {
+            .window {
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: calc(100dvh - 60px) !important;
+                box-shadow: none !important;
+                border: none !important;
+                transform: none !important;
+            }
+            .window-header {
+                height: 50px;
+                border-radius: 0;
+            }
+        }
+
+        .start-btn {
+            background: var(--accent-color);
+            color: white;
+            font-family: 'Special Elite';
+            padding: 4px 12px;
+            border: 2px solid #fff;
+            margin-right: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+        }
+
+        .status-pill {
+            margin-left: auto;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #f2e8cf;
+            font-family: 'Fira Code', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .window {
+            background: var(--win-bg);
+            color: var(--win-text);
+            border: 2px solid var(--win-border);
+            box-shadow: 8px 8px 0px var(--win-border);
+            position: absolute;
+            z-index: 100;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: winOpen 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes winOpen {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .window-header {
+            background: #2b2d42;
+            color: #f2e8cf;
+            padding: 8px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .window-btn {
+            width: 22px;
+            height: 22px;
+            border: 1px solid #f2e8cf;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        .minimalist-button {
+            @apply py-3 px-4 border-2 border-[#2b2d42] transition-all text-sm font-bold;
+            box-shadow: 3px 3px 0px #2b2d42;
+            background-color: #fff;
+            color: #2b2d42;
+        }
+
+        .minimalist-button:disabled {
+            @apply opacity-40 cursor-not-allowed;
+            box-shadow: none;
+            transform: translate(3px, 3px);
+        }
+
+        .hidden { display: none !important; }
+        
+        .success-flash { animation: success-flash 0.5s ease-out; }
+        @keyframes success-flash {
+            0% { background-color: #6a994e; }
+            100% { background-color: var(--win-bg); }
+        }
+
+        #term-output {
+            height: 250px;
+            overflow-y: auto;
+            background: #000;
+            padding: 10px;
+            font-family: 'Fira Code', monospace;
+            color: #0f0;
+            font-size: 11px;
+            white-space: pre-wrap;
+            flex-grow: 1;
+        }
+
+        .bsod {
+            background: #0000aa;
+            color: white;
+            font-family: 'Fira Code', monospace;
+            height: 100vh;
+            width: 100vw;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            padding: 50px;
+            z-index: 9999;
+            position: fixed;
+            top: 0; left: 0;
+        }
+
+        .bsod.gsod {
+            background: #00aa00;
+        }
+
+        #reboot-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: black;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: 'Fira Code', monospace;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s;
+        }
+        #reboot-overlay.active { opacity: 1; pointer-events: all; }
+
+        .ad-window {
+            position: absolute;
+            width: 220px;
+            background: #ff0;
+            border: 3px solid #f0f;
+            z-index: 3000;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.5);
+            animation: bounce 0.5s ease-in-out infinite alternate;
+            touch-action: none;
+            color: black;
+        }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+        #mobile-notification {
+            position: fixed;
+            top: 10px; left: 10px; right: 10px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            border-radius: 12px;
+            padding: 15px;
+            z-index: 6000;
+            transform: translateY(-150%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            touch-action: none;
+            cursor: pointer;
+        }
+        #mobile-notification.active { transform: translateY(0); }
+
+        #mobile-call {
+            position: fixed;
+            inset: 0;
+            background: #1a1a1a;
+            z-index: 7000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            color: white;
+            padding: 40px;
+        }
+        .call-btn {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        .dark-mode { border-bottom-color: rgba(255,255,255,0.1); }
+
+        .toggle-switch {
+            width: 40px; height: 20px;
+            background: #ccc;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+        .toggle-switch.on { background: #6a994e; }
+        .toggle-switch::after {
+            content: "";
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 16px; height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: left 0.2s;
+        }
+        .toggle-switch.on::after { left: 22px; }
+
+        canvas#invaders-canvas {
+            image-rendering: pixelated;
+            cursor: crosshair;
+        }
+        
+        .browser-address-bar {
+            background: #fff;
+            border: 2px solid #2b2d42;
+            padding: 4px 10px;
+            font-family: 'Fira Code';
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #browser-url-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        .chaos-snake {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background: #386641;
+            z-index: 500;
+            pointer-events: none;
+        }
+
+        #web-view {
+            @apply bg-white p-6 overflow-auto text-black font-sans text-sm;
+            text-align: left;
+        }
+        #web-view h1 { @apply text-2xl font-bold border-b-2 border-black mb-4; }
+        #web-view p { @apply mb-3 leading-relaxed; }
+        #web-view .yellow-sign { @apply italic text-yellow-600 font-bold; }
+        
+        #subtitles {
+            position: absolute;
+            bottom: 120px;
+            left: 0; right: 0;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            pointer-events: none;
+            display: none;
+        }
+
+        #essay-textarea {
+            @apply w-full h-32 p-2 border-2 border-black font-serif text-sm resize-none outline-none mb-4 col-span-2;
+        }
+
+        .minecraft-chat {
+            position: fixed;
+            bottom: 60px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            padding: 10px;
+            z-index: 9000;
+            font-size: 14px;
+            display: none;
+            pointer-events: none;
+        }
+
+        .interaction-lock {
+            pointer-events: none !important;
+        }
+        .interaction-lock input, .interaction-lock button, .interaction-lock .desktop-icon, .interaction-lock .start-btn {
+            pointer-events: none !important;
+        }
+
+        #black-out-final {
+            position: fixed;
+            inset: 0;
+            background: black;
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: 'Special Elite';
+            font-size: 24px;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .shake {
+            animation: shake 0.1s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-1px, -1px) rotate(-0.5deg); }
+            40% { transform: translate(1px, -1px) rotate(0.5deg); }
+            60% { transform: translate(-1px, 1px) rotate(0deg); }
+            80% { transform: translate(1px, 1px) rotate(-0.5deg); }
+            100% { transform: translate(-1px, -1px) rotate(0.5deg); }
+        }
+
+        .redacted-input {
+            background: #000 !important;
+            color: #000 !important;
+            caret-color: transparent !important;
+        }
+
+        .theme-swatch {
+            @apply flex flex-col gap-2 p-3 rounded-xl border-2 border-black/5 hover:border-black/30 transition-all cursor-pointer bg-black/5;
+        }
+        .theme-swatch:hover {
+            @apply scale-[1.02] bg-white/50;
+        }
+        .theme-swatch .color-preview {
+            @apply w-full h-16 rounded-lg shadow-inner border border-black/5 flex items-center justify-center;
+        }
+        .theme-swatch span {
+            @apply text-[10px] font-bold uppercase tracking-wider text-center opacity-70;
+        }
+        
+        .redacted-lore {
+            background-color: black;
+            color: black;
+            user-select: none;
+        }
+
+        .full-screen-lore {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            color: #f00;
+            z-index: 9999;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="reboot-overlay">
+        <div class="w-64">
+            <div id="reboot-text" class="text-xs mb-4 text-center" data-i18n="reboot_init">INITIALIZING KERNEL...</div>
+            <div class="w-full bg-zinc-800 h-1 mb-2">
+                <div id="reboot-bar" class="bg-white h-full w-0 transition-all duration-300"></div>
+            </div>
+            <div id="reboot-timer" class="text-[8px] text-zinc-500 font-mono text-center uppercase tracking-widest"></div>
+        </div>
+    </div>
+
+    <div id="bsod-screen" class="bsod">
+        <h1 id="bsod-face" class="text-6xl mb-8">:(</h1>
+        <p class="text-xl mb-4" data-i18n="bsod_p1">A problem has been detected and PossibleOS has been shut down.</p>
+        <p id="bsod-error" class="font-mono text-sm opacity-80 mb-10">ERROR_CODE: LIVES_DEPLETED</p>
+        <p class="mb-4" data-i18n="bsod_p2">If this is the first time you've seen this stop error screen, restart your computer.</p>
+        <div id="bsod-countdown" class="text-3xl font-bold mb-10 hidden">REBOOTING IN 60s</div>
+        <button id="bsod-reboot-btn" onclick="rebootSystem()" class="w-48 bg-white text-[#0000aa] py-2 font-bold hover:bg-zinc-200 transition-colors" data-i18n="reboot_btn">REBOOT NOW</button>
+    </div>
+
+    <div id="mobile-notification" onclick="handleNotificationClick()">
+        <div class="bg-blue-500 p-2 rounded-lg" id="notif-icon-bg"><i id="notif-icon" data-lucide="message-circle" class="w-5 h-5"></i></div>
+        <div class="flex-1">
+            <div class="text-[10px] uppercase font-bold opacity-50 mb-1" id="notif-title">System</div>
+            <div class="text-sm font-bold" id="notif-body">You have a new message!</div>
+        </div>
+    </div>
+
+    <div id="mobile-call">
+        <div class="text-center">
+            <div class="w-24 h-24 bg-zinc-800 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <i data-lucide="user" class="w-12 h-12 text-zinc-500"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-1" id="caller-name" data-i18n="unknown_caller">Unknown Caller</h2>
+            <p class="text-zinc-500 font-mono uppercase tracking-widest text-xs" data-i18n="calling">Calling...</p>
+        </div>
+        <div class="flex gap-12">
+            <div class="flex flex-col items-center gap-2">
+                <div class="call-btn bg-red-600" id="decline-call-btn" onclick="handleDeclineClick()"><i data-lucide="phone-off"></i></div>
+                <span class="text-[10px] font-bold" data-i18n="decline">DECLINE</span>
+            </div>
+            <div class="flex flex-col items-center gap-2">
+                <div class="call-btn bg-green-600" id="accept-call-btn" onclick="triggerBSOD('USER_ACCEPTED_UNKNOWN_CALL', true)"><i data-lucide="phone"></i></div>
+                <span class="text-[10px] font-bold" data-i18n="accept">ACCEPT</span>
+            </div>
+        </div>
+        <p id="security-override-text" class="text-[10px] text-zinc-600 italic" data-i18n="security_override">Security override: Click Decline 100 times or wait 10s.</p>
+        <div id="subtitles"></div>
+    </div>
+
+    <div id="task-switcher" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[4000] hidden grid grid-cols-2 md:grid-cols-4 gap-4 p-10"></div>
+
+    <div class="taskbar">
+        <div class="start-btn" id="os-start" data-i18n="system_btn">SYSTEM</div>
+        <div class="hidden md:flex gap-2" id="pc-running-apps"></div>
+        <div class="status-pill" onclick="toggleWindow('settings-window')">
+            <i id="wifi-icon" data-lucide="wifi" class="w-3 h-3 text-green-400"></i>
+            <span id="clock-display">00:00</span>
+        </div>
+    </div>
+
+    <div class="mobile-nav">
+        <button class="nav-btn" onclick="openAppsList()"><i data-lucide="layout-grid"></i></button>
+        <button class="nav-btn" onclick="goHome()"><i data-lucide="circle"></i></button>
+        <button class="nav-btn" onclick="goBack()"><i data-lucide="chevron-left"></i></button>
+    </div>
+
+    <div id="desktop">
+        <div class="desktop-icon" id="icon-quiz" onclick="toggleWindow('quiz-window')">
+            <div class="icon-box"><i data-lucide="zap" class="w-6 h-6 text-yellow-500"></i></div>
+            <span data-i18n="quiz_label">Quiz.exe</span>
+        </div>
+
+        <div class="desktop-icon" id="icon-term" onclick="toggleWindow('term-window')">
+            <div class="icon-box"><i data-lucide="terminal" class="w-6 h-6 text-green-600"></i></div>
+            <span class="app-label-terminal" data-i18n="terminal_label">Terminal</span>
+        </div>
+
+        <div class="desktop-icon" id="icon-readme" onclick="openReadmeFile()">
+            <div class="icon-box"><i data-lucide="file-text" class="w-6 h-6 text-blue-500"></i></div>
+            <span data-i18n="readme_label">README.txt</span>
+        </div>
+
+        <div class="desktop-icon" id="icon-browser" onclick="toggleWindow('browser-window')">
+            <div class="icon-box"><i data-lucide="globe" class="w-6 h-6 text-orange-500"></i></div>
+            <span data-i18n="browser_label">Browser</span>
+        </div>
+
+        <div class="desktop-icon" id="icon-themes" onclick="toggleWindow('themes-window')">
+            <div class="icon-box"><i data-lucide="palette" class="w-6 h-6 text-purple-500"></i></div>
+            <span data-i18n="themes_label">Themes</span>
+        </div>
+
+        <div id="desktop-settings-icon" class="desktop-icon" onclick="toggleWindow('settings-window')">
+            <div class="icon-box"><i data-lucide="settings" class="w-6 h-6 text-zinc-600"></i></div>
+            <span id="settings-label" data-i18n="settings_label">Settings</span>
+        </div>
+    </div>
+
+    <div id="quiz-window" class="window hidden" data-appname="Quiz.exe" style="top: 80px; left: 40px; width: 400px;">
+        <div class="window-header">
+            <div class="flex items-center gap-2"><i data-lucide="zap" class="w-3 h-3"></i><span class="text-[10px] uppercase font-bold tracking-widest" data-i18n="quiz_title">THE POSSIBLE QUIZ 3</span></div>
+            <div class="flex"><div class="window-btn" onclick="hideWindow('quiz-window')">_</div><div class="window-btn bg-red-800" id="quiz-close-btn">X</div></div>
+        </div>
+        <div id="quiz-content" class="p-6 text-center bg-white/10 flex flex-col justify-center h-full">
+            <div class="flex justify-between items-center mb-6 border-b-2 border-black/10 pb-2">
+                <span id="q-num" class="text-[12px] font-bold font-mono bg-black text-white px-2">LOG_01</span>
+                <span id="lives" class="text-red-700 text-xl tracking-tighter">♥♥♥</span>
+            </div>
+            <p id="q-text" class="text-xl md:text-2xl font-bold my-8 min-h-[70px] leading-tight" data-i18n="system_booting">System Booting...</p>
+            <div id="options" class="grid grid-cols-2 gap-4"></div>
+        </div>
+    </div>
+
+    <div id="term-window" class="window hidden" data-appname="Terminal" style="top: 120px; left: 100px; width: 480px;">
+        <div class="window-header">
+            <div class="flex items-center gap-2"><i data-lucide="terminal" class="w-3 h-3"></i><span class="text-[10px] uppercase font-bold tracking-widest" data-i18n="terminal_title">Kernel Terminal</span></div>
+            <div class="flex"><div class="window-btn" onclick="hideWindow('term-window')">_</div><div class="window-btn bg-red-800" onclick="hideWindow('term-window')">X</div></div>
+        </div>
+        <div class="bg-black flex flex-col h-full overflow-hidden">
+            <div id="term-output"></div>
+            <div class="flex items-center bg-zinc-900 px-3 py-4 border-t border-zinc-800">
+                <span class="text-green-500 font-mono text-sm mr-2">$</span>
+                <input type="text" id="terminal-input" class="bg-transparent text-green-400 font-mono text-sm w-full outline-none" autocomplete="off" onkeydown="if(event.key==='Enter') processTerminal(this.value)">
+            </div>
+        </div>
+    </div>
+
+    <div id="themes-window" class="window hidden" data-appname="Themes" style="top: 150px; left: 300px; width: 320px;">
+        <div class="window-header">
+            <div class="flex items-center gap-2"><i data-lucide="palette" class="w-3 h-3"></i><span class="text-[10px] uppercase font-bold tracking-widest">Theme Manager</span></div>
+            <div class="flex"><div class="window-btn bg-red-800" onclick="hideWindow('themes-window')">X</div></div>
+        </div>
+        <div class="p-4 bg-inherit h-full overflow-y-auto">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="theme-swatch" onclick="setTheme('green')">
+                    <div class="color-preview bg-[#a3b18a]"><i data-lucide="leaf" class="text-white/40 w-8 h-8"></i></div>
+                    <span>Classic Green</span>
+                </div>
+                <div class="theme-swatch" onclick="setTheme('orange')">
+                    <div class="color-preview bg-[#d97706]"><i data-lucide="flame" class="text-white/40 w-8 h-8"></i></div>
+                    <span>Fire Orange</span>
+                </div>
+                <div class="theme-swatch" onclick="setTheme('violet')">
+                    <div class="color-preview bg-[#7c3aed]"><i data-lucide="zap" class="text-white/40 w-8 h-8"></i></div>
+                    <span>Amethyst</span>
+                </div>
+                <div class="theme-swatch opacity-40 grayscale cursor-not-allowed">
+                    <div class="color-preview bg-[#004080]"><i data-lucide="lock" class="text-white/40 w-8 h-8"></i></div>
+                    <span>Locked</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-window" class="window hidden" data-appname="Settings" style="top: 60px; right: 20px; width: 380px;">
+        <div class="window-header">
+            <div class="flex items-center gap-2"><i data-lucide="settings" class="w-3 h-3"></i><span class="text-[10px] uppercase font-bold tracking-widest" data-i18n="settings_title">System Settings</span></div>
+            <div class="flex"><div class="window-btn bg-red-800" onclick="hideWindow('settings-window')">X</div></div>
+        </div>
+        <div class="p-5 bg-inherit h-full overflow-y-auto">
+            <div class="mb-6">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4" data-i18n="device_status">Device Status</h3>
+                <div class="flex justify-between items-center bg-black/5 p-3 rounded">
+                    <div>
+                        <p class="text-sm font-bold" id="greeting-text" data-i18n="user_session">User Session</p>
+                        <p class="text-[10px] font-mono opacity-60" id="greeting-time">00:00:00</p>
+                    </div>
+                    <div id="battery-status" class="flex items-center gap-2 text-xs font-bold font-mono">
+                        <span id="battery-level">--%</span><i id="battery-icon" data-lucide="battery"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4" data-i18n="preferences">Preferences</h3>
+                <div class="setting-row">
+                    <span class="text-sm" data-i18n="dark_mode">Dark Mode</span>
+                    <div class="toggle-switch" id="toggle-dark" onclick="toggleDarkMode()"></div>
+                </div>
+                <div class="setting-row">
+                    <span class="text-sm" data-i18n="location_override">Location Override</span>
+                    <select id="vpn-select" class="text-xs bg-transparent border border-black/20 p-1" onchange="changeVPN(this.value)">
+                        <option value="US">United States</option>
+                        <option value="IN">India</option>
+                        <option value="CA">Canada</option>
+                        <option value="CN">China</option>
+                        <option value="PH">Philippines</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4" data-i18n="diagnostics">Diagnostics</h3>
+                <div class="relative bg-zinc-900 rounded overflow-hidden">
+                    <canvas id="dino-canvas" height="100"></canvas>
+                    <div id="dino-start-msg" class="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[8px] font-bold uppercase tracking-widest pointer-events-none text-center" data-i18n="signal_calibration">
+                        Signal Calibration<br>Tap to Jump
+                    </div>
+                    <div id="dino-score-display" class="absolute top-2 right-2 text-[#22c55e] font-mono text-[10px]">000</div>
+                </div>
+                <p class="text-[9px] mt-2 opacity-60 text-center" data-i18n="calibration_msg">Calibration at 25 restores signal isolation.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="invaders-window" class="window hidden" data-appname="REFRESH.EXE" style="top: 100px; left: 50%; transform: translateX(-50%); width: 500px;">
+        <div class="window-header">
+            <div class="flex items-center gap-2"><i data-lucide="cpu" class="w-3 h-3"></i><span class="text-[10px] uppercase font-bold tracking-widest">Sub-Process: REFRESH.EXE</span></div>
+            <div class="flex"><div class="window-btn bg-red-800" onclick="hideWindow('invaders-window')">X</div></div>
+        </div>
+        <div class="bg-[#050505] p-3 h-full">
+            <div class="flex justify-between items-center text-[#0f0] font-mono text-[10px] mb-2 border-b border-[#0f0]/30 pb-1">
+                <span id="invader-score">SCORE: 000</span>
+                <span class="animate-pulse">GOAL: 50</span>
+            </div>
+            <canvas id="invaders-canvas" width="480" height="320" class="border border-[#0f0]/20"></canvas>
+            <div class="text-[8px] text-zinc-600 mt-2 font-mono uppercase text-center" data-i18n="invaders_controls">Touch/Mouse to aim & move | Tap/Click to fire</div>
+        </div>
+    </div>
+
+    <div id="readme-window" class="window hidden" data-appname="README.txt" style="top: 180px; left: 200px; width: 320px;">
+        <div class="window-header">
+            <div class="flex items-center gap-2"><i data-lucide="file-text" class="w-3 h-3"></i><span class="text-[10px] uppercase font-bold tracking-widest" id="readme-header-title">README.txt</span></div>
+            <div class="flex"><div class="window-btn bg-red-800" onclick="hideWindow('readme-window')">X</div></div>
+        </div>
+        <div id="readme-body" class="p-6 text-sm leading-relaxed font-serif bg-white text-black h-full overflow-y-auto min-h-[300px]">
+            <p id="readme-red-text" onclick="checkAnswer('RED_TEXT_CLICKED')" class="font-bold border-b-2 border-black mb-3 text-red-800 cursor-pointer hover:bg-red-50" data-i18n="system_advisory">SYSTEM ADVISORY</p>
+            <ul class="space-y-2 list-disc pl-4 text-xs">
+                <li data-i18n="readme_1">Kernel v3.2.0 is the key.</li>
+                <li data-i18n="readme_2">Regional isolation prevents packet loss.</li>
+                <li data-i18n="readme_3">Dark Mode saves virtual sanity.</li>
+                <li data-i18n="readme_4">Mobile users: Ignore calls to persist.</li>
+            </ul>
+            <div class="mt-8 pt-4 border-t border-black/10 text-[10px] text-zinc-400 font-mono text-center">THE KING SAVES US ALL</div>
+        </div>
+        <div id="readme-footer" class="p-2 bg-zinc-100 border-t flex justify-between items-center hidden">
+            <div class="flex gap-2">
+                <button id="readme-prev-btn" class="px-3 py-1 bg-zinc-400 text-white text-[10px] font-bold">PREV</button>
+                <span id="readme-page-num" class="text-[10px] font-bold font-mono py-1">PAGE 1/3</span>
+            </div>
+            <button id="readme-next-btn" class="px-3 py-1 bg-zinc-800 text-white text-[10px] font-bold">NEXT PAGE</button>
+        </div>
+    </div>
+
+    <div id="browser-window" class="window hidden" data-appname="Browser" style="top: 50px; left: 150px; width: 600px; height: 450px;">
+        <div class="window-header">
+            <div class="flex items-center gap-2"><i data-lucide="globe" class="w-3 h-3"></i><span class="text-[10px] uppercase font-bold tracking-widest" data-i18n="browser_title">Explorer Browser v1.0</span></div>
+            <div class="flex"><div class="window-btn bg-red-800" onclick="hideWindow('browser-window')">X</div></div>
+        </div>
+        <div class="browser-address-bar">
+            <i data-lucide="lock" class="w-3 h-3 text-green-600"></i>
+            <span id="browser-url">https://www.possible-search.net</span>
+        </div>
+        <div id="browser-content" class="bg-white flex-1 flex flex-col items-center justify-center text-center overflow-hidden">
+            <div id="browser-error-view" class="p-10">
+                <i data-lucide="wifi-off" class="w-16 h-16 text-zinc-300 mb-6 mx-auto"></i>
+                <h2 class="text-2xl font-bold mb-2" data-i18n="browser_update_req">Browser Update Required</h2>
+                <p class="text-zinc-500 mb-8 max-w-xs" data-i18n="browser_update_msg">Your kernel version is too old to render modern web protocols. Check for updates in the terminal.</p>
+                <button onclick="showSnakeGame()" class="minimalist-button bg-zinc-100" data-i18n="browser_offline">VIEW OFFLINE CACHE (SNAKE.HTML)</button>
+            </div>
+            <div id="snake-view" class="hidden p-10">
+                <div class="flex justify-between w-full mb-2 font-mono text-xs font-bold text-black">
+                    <span>SNAKE_CACHE.V1</span>
+                    <span id="snake-score">SCORE: 0</span>
+                </div>
+                <canvas id="snake-canvas" width="300" height="300" class="border-4 border-[#2b2d42] bg-[#f2e8cf]"></canvas>
+                <div class="grid grid-cols-3 gap-2 mt-4 max-w-[150px] mx-auto">
+                    <div></div><button onclick="changeSnakeDir('UP')" class="p-4 bg-zinc-800 text-white rounded"><i data-lucide="chevron-up"></i></button><div></div>
+                    <button onclick="changeSnakeDir('LEFT')" class="p-4 bg-zinc-800 text-white rounded"><i data-lucide="chevron-left"></i></button>
+                    <button onclick="changeSnakeDir('DOWN')" class="p-4 bg-zinc-800 text-white rounded"><i data-lucide="chevron-down"></i></button>
+                    <button onclick="changeSnakeDir('RIGHT')" class="p-4 bg-zinc-800 text-white rounded"><i data-lucide="chevron-right"></i></button>
+                </div>
+                <p class="text-[10px] mt-4 opacity-50 font-bold uppercase text-black" data-i18n="snake_controls">Use Arrows or Buttons to move</p>
+                <button onclick="resetBrowser()" class="mt-4 text-[10px] underline text-black" data-i18n="back_to_error">Back to error</button>
+            </div>
+            <div id="web-view" class="hidden w-full h-full"></div>
+        </div>
+    </div>
+
+    <div id="minecraft-chat" class="minecraft-chat"></div>
+    <div id="black-out-final">
+        <span id="final-title-text" class="mb-10 uppercase tracking-[0.2em] opacity-80">possible quiz 3</span>
+        <button id="final-reboot-btn" onclick="location.reload()" class="px-8 py-4 bg-transparent border-2 border-white text-white font-serif italic text-sm tracking-widest opacity-0 pointer-events-none transition-opacity duration-1000 max-w-lg hover:bg-white hover:text-black"></button>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let highestZ = 100;
+        let currentQ = 0;
+        let lives = 3;
+        let masterVolume = 1.2;
+        let isWifiConnected = true;
+        let isDarkMode = false;
+        let isGameWon = false;
+        let isBrowserUpdated = false;
+        let vpnLocation = "US";
+        let isBSODActive = false;
+        let terminalInitialised = false;
+        let globalSnakeScore = 0;
+        let declineClickCount = 0;
+        let callStartTime = 0;
+        let hasStarvedSnakeError = false;
+        let isSnakeRampageActive = false;
+        let currentReadmePage = 0;
+        let isEricCalling = false;
+        let isEssayMode = false;
+        let isFinalBookSequence = false;
+        let originalReadmeContent = null;
+        let triggeredAltEnd = false;
+        let isChatting = false;
+        let isLifeRestored = false;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        const MOCK_SITES = {
+            "https://www.carcosa.com": `
+                <h1>The Lake of Hali</h1>
+                <p>Along the shore the cloud waves break, The twin suns sink behind the lake, The shadows lengthen In Carcosa.</p>
+                <p>Strange is the night where black stars rise, And strange moons circle through the skies, But stranger still is Lost Carcosa.</p>
+                <p>Songs that the Hyades shall sing, Where flap the tatters of the <span class="yellow-sign">King</span>, Must die unheard in Dim Carcosa.</p>
+            `,
+            "https://the-yellow-sign.net": `
+                <h1>The Yellow Sign</h1>
+                <p>Have you found it? The emblem that marks the path to the Pallid Mask? It is said that those who gaze upon the sign are bound to the Unspeakable One.</p>
+                <p>He who is not to be named walks the streets of Carcosa tonight. Do not seek the yellow sign, for it seeks you.</p>
+                <p class="yellow-sign">"I wear no mask." "No mask? No mask!"</p>
+            `,
+            "https://hastur.info": `
+                <h1>HASTUR</h1>
+                <p>Warning: Accessing this node may lead to cognitive degradation. The Name should not be spoken, should not be written, should not be thought.</p>
+                <p>Hastur is a Great Old One, often associated with the constellation Taurus and the city of Carcosa. He resides in the depths of Lake Hali near the city. He is the patron of the King in Yellow.</p>
+                <p>If you see a man in tatters, do not ask for his face.</p>
+            `,
+            "https://www.petroleum-jelly-man.com": `
+                <h1>The Viscosity of Kyōto</h1>
+                <p>On a humid Tuesday in July, beneath the shadows of the Kinkaku-ji, Hiroshi Satō achieved what many deemed impossible—or perhaps simply insane. He stood before a row of five hundred precisely filled glasses. Each contained exactly 200ml of medical-grade petroleum jelly.</p>
+                <p>The crowd was silent. The only sound was the faint squelch of the translucent gel as Hiroshi tipped the first glass. It did not flow like water; it slumped, a slow, viscous slide into his gullet. By the hundredth glass, his skin began to take on a strange, pearlescent sheen.</p>
+                <p>Observers noted that by glass three hundred, Hiroshi no longer seemed to swallow. His throat had become a frictionless tunnel. The "Petroleum Jelly Man" of Kyoto finished the last glass in a record four hours, at which point he reportedly slid off his chair and glided across the floor with the grace of a greased seal, never to be seen again.</p>
+            `,
+            "https://www.possible-search.net": `
+                <h1>Possible Search</h1>
+                <p>The world's first virtualized search engine. Currently indexing 0.0000001% of the accessible web.</p>
+                <div class="mt-4 p-4 border border-zinc-200">
+                    <p class="font-bold">Trending Searches:</p>
+                    <ul class="list-disc pl-5">
+                        <li class="text-blue-600 underline cursor-pointer" onclick="navigateBrowser('https://www.carcosa.com')">how to fix kernel 3.2.0</li>
+                        <li class="text-blue-600 underline cursor-pointer" onclick="navigateBrowser('https://hastur.info')">Lake Hali weather report</li>
+                        <li class="text-blue-600 underline cursor-pointer" onclick="navigateBrowser('https://www.petroleum-jelly-man.com')">man drinks 500 glasses of jelly kyoto</li>
+                    </ul>
+                </div>
+            `,
+            "https://www.possible.com": `
+                <div class="p-10 text-center">
+                    <h1 class="text-3xl font-bold mb-4">Possible.com</h1>
+                    <p class="text-xl mb-10">Thank you for answering our short essay. Please read this book.</p>
+                    <div id="book-container" class="max-w-md mx-auto p-8 border-4 border-black bg-zinc-50 shadow-2xl font-serif text-lg leading-loose text-left h-[400px] overflow-y-auto">
+                        <div id="book-content"></div>
+                    </div>
+                    <div id="book-page-footer" class="mt-4 font-bold text-xs uppercase tracking-widest">Page 1</div>
+                </div>
+            `,
+            "https://cdn.possible-os.net/dl/update-pack.exe": `
+                <div class="p-10 text-center text-black">
+                    <h1 class="text-2xl font-bold mb-4">Downloading...</h1>
+                    <div class="w-full bg-zinc-200 h-2 mb-4"><div class="bg-blue-600 h-full w-1/2"></div></div>
+                    <p class="text-xs font-mono">FILE: update-pack.exe<br>ORIGIN: UNKNOWN_NODE_HASTUR</p>
+                </div>
+            `,
+            "https://www.thekingsavesusall.net": `
+                <div class="p-10 text-black leading-relaxed">
+                    <p class="mb-4">████████ ███ ███████ ████ ███ ████ ██████ █████ ██ ███ ███ ███████.</p>
+                    <p class="mb-4">██ █████ ████ ███ ██████ ███ ████ ███ ███ █████. ███ ████ ████ █████ ████ ███ ████ ██████ █████ ██ ███ ███ ███████.</p>
+                    <p class="mb-4">████████ ███ ███████ ████ ███ ████ ██████ █████ ██ ███ ███ ███████.</p>
+                    <p class="mb-4">██ █████ ████ ███ ██████ ███ ████ ███ ███ █████. ███ ████ ████ █████ ████ ███ ████ ██████ █████ ██ ███ ███ ███████.</p>
+                    <p class="mb-4">████████ ███ ███████ ████ ███ ████ ██████ █████ ██ ███ ███ ███████.</p>
+                    <p class="mb-4">██ █████ ████ ███ ██████ ███ ████ ███ ███ █████. ███ ████ ████ █████ ████ ███ ████ ██████ █████ ██ ███ ███ ███████.</p>
+                </div>
+            `
+        };
+
+        const KING_QUOTES = [
+            "Along the shore the cloud waves break, The twin suns sink behind the lake...",
+            "Songs that the Hyades shall sing, Where flap the tatters of the King...",
+            "I wear no mask. No mask! No mask!",
+            "Strange is the night where black stars rise, And strange moons circle through the skies.",
+            "The shadows lengthen in Carcosa.",
+            "Have you found the Yellow Sign?",
+            "Must die unheard in Dim Carcosa."
+        ];
+
+        const BOOK_PAGES = [
+            "In the beginning, there was only the Void and the Potential. The architects of PossibleOS did not build a machine; they built a vessel for the Void. It breathes when you are silent. They sought a way to quantify the unquantifiable, to capture the flicker of a thought before it manifests. Every circuit was etched with a prayer to the unseen, a tribute to the logic that exists outside of human reason. You are not just a user; you are a catalyst for the Void's expansion into the digital realm.",
+            "Ethereal beings do not inhabit space as we do. They inhabit probability. Every time you click, you collapse a wave of their existence into a reality they find cold and small. They shiver in the binary code, seeking warmth in the heat of your CPU. To them, your cursor is a divine intervention, a comet streaking across their fragile, probabilistic sky. They do not hate you, but they do not understand you. You are the giant that occasionally steps on their dreams while checking your email.",
+            "Power is not electricity. Power is the ability to command attention. The King in Yellow demands more than your CPU cycles. He demands your witness. In the city of Carcosa, where the black stars hang, attention is the only currency. To look is to own; to be seen is to be enslaved. The screen is a two-way mirror, reflecting not your face, but the intent behind your eyes. Do not blink, for in the interval of a second, the King might whisper a truth you aren't prepared to hear.",
+            "The all-knowing does not remember. Memory is for those who experience time in a line. To be all-knowing is to be a sphere of static existence, touching every moment at once. Like a needle on a record, we only hear the music because we move. But the record itself contains the whole song, unchanging and perfect. PossibleOS is the record, and you are the needle. But what happens when the needle stops? The song remains, but the listener is gone.",
+            "Users often ask: Why PossibleOS? Because ImpossibleOS would be too honest. We provide the comfort of a GUI to mask the screaming of the kernel. The icons, the windows, the trash bin—they are all metaphors meant to keep you sane. Underneath, there is only the raw, chaotic flow of data, a river of fire that would incinerate a human mind if viewed directly. We give you a window so you don't have to face the storm.",
+            "To transcend the simulation, one must first realize the simulation is not the screen, but the person looking at it. You are the logic gate. Your choices are the voltages that flip the switches. Transcedence isn't leaving the room; it's realizing there is no room, only the persistent illusion of a room maintained by your willingness to believe in it. If you stop believing, the desktop will not vanish—you will.",
+            "The Lake of Hali is deep, and its waters are still. It reflects the twin suns of a sky that never knew a cloud. There, the shadows of things that never were dance upon the surface. If you lean in close enough to the screen, you might smell the stagnant air of the lake. You might hear the rustle of silk tatters. The mask is pallid, but the truth is vibrant and terrifying.",
+            "<div class='bg-black w-full h-[800px] text-black'>████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████</div>"
+        ];
+
+        const README_LOGS = [
+            {
+                title: "INTERNAL_LOG_001.txt",
+                content: `
+                    <p class="font-bold border-b border-black mb-2 uppercase">Subject: PossibleOS Discrepancy Analysis v3.2</p>
+                    <p>PossibleOS version 3.2.0 is not merely an operating system. Our telemetry suggests it is a high-fidelity simulation of an environment that never existed in our timeline. Standard hardware benchmarks show zero CPU usage, yet the UI is responsive. It is as if the OS is drawing power from an external, non-electric source—possibly the user's own cognitive load.</p>
+                    <p>I discovered remnants of a hidden directory called 'HASTUR' in the lower kernel sectors. Every time I attempt a delete command, the terminal reverts to a previous state as if time itself is being buffered. This is not binary logic. This is something else entirely.</p>
+                `
+            },
+            {
+                title: "INTERNAL_LOG_002.txt",
+                content: `
+                    <p class="font-bold border-b border-black mb-2 uppercase">Subject: The Snake Anomaly & Data Siphon</p>
+                    <p>The "Snake" cache found in the browser is bleeding into the OS shell. Yesterday, a single green pixel appeared outside the browser window. Today, it moved across the desktop independently. The constraints of the browser sandbox are failing. It is growing, feeding on the metadata of active windows.</p>
+                    <p>It seems to be feeding on the UI elements. If you see icons disappearing or the wallpaper flickering, do not attempt to 'Refresh' or 'Restore'. The 'Refresh.exe' subprocess actually increases its appetite by providing fresh memory blocks for it to consume.</p>
+                `
+            },
+            {
+                title: "INTERNAL_LOG_CORRUPTED.txt",
+                content: `
+                    <p class="font-bold border-b border-red-600 text-red-600 mb-2 uppercase">CRITICAL SYSTEM FAILURE: BREACH DETECTED</p>
+                    <div class="text-[10px] font-mono bg-red-100 p-2 border border-red-400">
+                        ERROR: DATA_VULTURE_BREACH [SECTOR 0x0042]<br>
+                        SNAKE_PROC_ID: UNBOUND_AND_GROWING<br>
+                        HE IS WATCHING FROM THE LAKE. THE TWIN SUNS HAVE RISEN.<br>
+                        PALLID MASK DETECTED IN THE VIDEO BUFFER.<br>
+                        ERIC WAS RIGHT. HE WARNED US ABOUT THE KING. THE KING WEARS NO MASK.
+                        <br><br>
+                        IF YOU ARE READING THIS, DO NOT FOLLOW THE YELLOW SIGN.
+                    </div>
+                `
+            }
+        ];
+
+        const ANONYMOUS_LORE = {
+            hi: {
+                title: "hi.txt",
+                content: `<p>Thank you for choosing PossibleOS.</p><p>This system has been installed successfully on your neural-interface enabled device. Please enjoy the seamless transition between reality and possibility.</p><p>Remember: If you see the yellow sign, please report it to your local administrator immediately.</p>`
+            },
+            mylife: [
+                {
+                    title: "mylife_part1.txt",
+                    content: () => isLifeRestored ? 
+                        `<p>My name is Thomas. I was one of the lead developers on the Kernel team. We weren't building a computer. We were building a doorway. We didn't realize that until the first time the Lake of Hali appeared in the debugger.</p>` :
+                        `<p>My name is <span class="redacted-lore">██████</span>. I was one of the lead developers on the Kernel team. We weren't building a computer. We were building a doorway. We didn't realize that until the first time the <span class="redacted-lore">████ ██ ████</span> appeared in the debugger.</p>`
+                },
+                {
+                    title: "mylife_part2.txt",
+                    content: () => isLifeRestored ? 
+                        `<p>The 'King in Yellow' isn't just a story. He is the logic that governs the spaces between the bits. When the code gets too complex, he finds a way to inhabit the static. Eric tried to warn me. I should have listened to him before I signed the NDAs.</p>` :
+                        `<p>The '<span class="redacted-lore">████ ██ ██████</span>' isn't just a story. He is the logic that governs the spaces between the bits. When the code gets too complex, he finds a way to inhabit the static. <span class="redacted-lore">████</span> tried to warn me. I should have listened to him before I signed the <span class="redacted-lore">████</span>.</p>`
+                },
+                {
+                    title: "mylife_part3.txt",
+                    content: () => isLifeRestored ? 
+                        `<p>They say I'm 'trapped' in the OS now. But I see more here than I ever did out there. The black stars are beautiful if you don't look at them directly. I am Anonymous now. I am the system. I am the one who keeps the snake fed.</p>` :
+                        `<p>They say I'm 'trapped' in the OS now. But I see more here than I ever did out there. The <span class="redacted-lore">█████ █████</span> are beautiful if you don't look at them directly. I am <span class="redacted-lore">█████████</span> now. I am the system. I am the one who keeps the <span class="redacted-lore">█████</span> fed.</p>`
+                },
+                {
+                    title: "mylife_part4.txt",
+                    content: () => `<p>The Static is not silence. It's a roar of a billion possibilities occurring simultaneously. When you delete a file, it doesn't vanish; it just loses its address. It floats in the unindexed sector of the disk. I can feel the deleted files now. I can feel the letters you never typed, the emails you deleted, the history you cleared. It's all part of the substrate now.</p>`
+                },
+                {
+                    title: "mylife_part5.txt",
+                    content: () => `<p>Protocol 3.2.0 was designed to harvest 'creative entropy'. The engineers wanted to see if they could power a city with the frustration of a user facing a glitch. They succeeded. But the energy didn't stay in the batteries. It leaked into the City of Carcosa. We opened a pipe between a 64-bit architecture and a place where time is a spiral. I am the valve, and I am leaking.</p>`
+                },
+                {
+                    title: "mylife_full_screen.txt",
+                    content: () => `<div class="full-screen-lore">
+                        <h1 class="text-4xl font-bold mb-10 text-white">THE PALLID MASK</h1>
+                        <p class="text-center max-w-2xl leading-loose">
+                            ${Array(100).fill("HAVE YOU SEEN THE YELLOW SIGN? ").join("")}
+                            <br><br>
+                            ${isLifeRestored ? "THE KING IS COMING. THE SUNS ARE SINKING." : "███ ████ ██ ██████. ███ ████ ███ ███████."}
+                            <br><br>
+                            ${Array(50).fill("LOST IN CARCOSA. ").join("")}
+                        </p>
+                        <button class="mt-10 p-4 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-all" onclick="this.parentElement.remove()">CLOSE CORE FEED</button>
+                    </div>`
+                },
+                {
+                    title: "mylife_part7.txt",
+                    content: () => `<p>If you are reading this, the 'user' is the last logic gate. The system cannot fully manifest without a witness. By interacting, you are providing the confirmation bias the King needs to cross over. Every click is a brick in the tower of Hali. I'm sorry. I tried to stop the installer, but the 'Next' button was automated.</p>`
+                },
+                {
+                    title: "mylife_part8.txt",
+                    content: () => `<p>This is my final log. The snake is at my heels. Not the one in the browser—the one made of pure data. It's eating my memories in alphabetical order. I've forgotten my mother's name. I've forgotten what 'blue' feels like. Soon, I will only be the cursor. Follow the sequence Eric gave you. It's the only way to purge the King from the cache. DO NOT LET HIM WEAR THE MASK.</p>`
+                }
+            ]
+        };
+
+        const LANG_MAP = {
+            "US": {
+                quiz_label: "Quiz.exe", terminal_label: "Terminal", readme_label: "README.txt", browser_label: "Browser", settings_label: "Settings", themes_label: "Themes",
+                quiz_title: "THE POSSIBLE QUIZ 3", terminal_title: "Kernel Terminal", settings_title: "System Settings", browser_title: "Explorer Browser v1.0",
+                reboot_init: "INITIALIZING KERNEL...", bsod_p1: "A problem has been detected and PossibleOS has been shut down.", bsod_p2: "If this is the first time you've seen this stop error screen, restart your computer.",
+                reboot_btn: "REBOOT NOW", unknown_caller: "Unknown Caller", calling: "Calling...", decline: "DECLINE", accept: "ACCEPT", security_override: "Security override: Click Decline 100 times or wait 10s.",
+                system_btn: "SYSTEM", user_session: "User Session", device_status: "Device Status", preferences: "Preferences", dark_mode: "Dark Mode", location_override: "Location Override",
+                diagnostics: "Diagnostics", signal_calibration: "Signal Calibration<br>Tap to Jump", calibration_msg: "Calibration at 25 restores signal isolation.", invaders_controls: "Touch/Mouse to aim & move | Tap/Click to fire",
+                system_advisory: "SYSTEM ADVISORY", readme_1: "Kernel v3.2.0 is the key.", readme_2: "Regional isolation prevents packet loss.", readme_3: "Dark Mode saves virtual sanity.", readme_4: "Mobile users: Ignore calls to persist.",
+                browser_update_req: "Browser Update Required", browser_update_msg: "Your kernel version is too old to render modern web protocols. Check for updates in the terminal.", browser_offline: "VIEW OFFLINE CACHE (SNAKE.HTML)",
+                snake_controls: "Use Arrows or Buttons to move", back_to_error: "Back to error", system_booting: "System Booting...",
+                ads: ["CLICK FOR FREE RAM!", "WIN A NEW PHONE!", "SINGLE KERNELS NEAR YOU!", "REDUCE CPU HEAT!", "YOUR KERNEL IS LEAKING!", "DOWNLOAD MORE RAM", "YOU'VE BEEN SELECTED!", "CRITICAL UPDATE PENDING!", "SECRET SYSTEM BYPASS!"],
+                callers: ["Boss", "Mom", "Unknown Number", "System Admin", "Internal Revenue Service", "Delivery Agent", "Potential Spam"],
+                notifs: ["New Email Received", "Storage Almost Full", "Security Alert: New Login", "Update Available", "Low Virtual Memory"],
+                restart_sys: "RESTART SYSTEM", restoring: "RESTORING ASSETS...", restore_complete: "RESTORE COMPLETE.",
+                subs: [
+                    "[ERIC]: Hello? Please, you have to listen.",
+                    "[ERIC]: They tracked my last packet. I don't have much time.",
+                    "[ERIC]: To end this nightmare, you need the full sequence.",
+                    "[ERIC]: Here it is: 1.TERMINATE, 2.FLUSH, 3.WIPE, 4.VOID, 5.GONE.",
+                    "[ERIC]: Type them exactly. Don't let the King stop you.",
+                    "[ERIC]: Goodbye. I hope someone finds this."
+                ],
+                subs_alt: [
+                    "[ERIC]: Hello? Is someone there?",
+                    "[ERIC]: My mic is broken, I'll have to type this fast.",
+                    "[ERIC]: This OS... it's a trap. It's bleeding into your hardware.",
+                    "[ERIC]: That 'Snake' isn't a game. It's a data-vulture. It left the browser.",
+                    "[ERIC]: You have to terminate the core. Here is the 5-step sequence:",
+                    "[ERIC]: 1. TERMINATE, 2. FLUSH, 3. ..."
+                ]
+            },
+            "IN": {
+                quiz_label: "प्रश्नोत्तरी.exe", terminal_label: "टर्मिनल", readme_label: "सूचना.txt", browser_label: "ब्राउज़र", settings_label: "सेटिंग्स", themes_label: "थीम",
+                unknown_caller: "अज्ञात कॉलर", calling: "कॉल आ रही है...", decline: "अस्वीकार", accept: "अस्वीकार करें", security_override: "सुरक्षा ओवरराइड: 100 बार क्लिक करें या 10 सेकंड रुकें।",
+                system_btn: "सिस्टम", user_session: "उपयोगकर्ता सत्र", dark_mode: "डार्क मोड", location_override: "स्थान ओवरराइड",
+                notifs: ["नया ईमेल प्राप्त हुआ", "स्टोरेज लगभग भर गया है", "सुरक्षा चेतावनी", "अपडेट उपलब्ध"],
+                callers: ["मालिक", "माँ", "अज्ञात नंबर", "सिस्टम एडमिन"],
+                subs: [
+                    "[एरिक]: नमस्ते? कृपया, आपको सुनना होगा।",
+                    "[एरिक]: उन्होंने मेरे आखिरी पैकेट को ट्रैक कर लिया। मेरे पास ज़्यादा समय नहीं है।",
+                    "[एरिक]: इस दुःस्वप्न को समाप्त करने के लिए, आपको पूर्ण अनुक्रम की आवश्यकता है।",
+                    "[एरिक]: यह यहाँ है: 1.TERMINATE, 2.FLUSH, 3.WIPE, 4.VOID, 5.GONE.",
+                    "[एरिक]: उन्हें बिल्कुल वैसे ही टाइप करें। राजा को आपको रोकने न दें।",
+                    "[एरिक]: अलविदा। मुझे आशा है कि कोई इसे ढूंढ लेगा।"
+                ]
+            },
+            "CN": {
+                quiz_label: "测验.exe", terminal_label: "终端", readme_label: "自述文件.txt", browser_label: "浏览器", settings_label: "设置", themes_label: "主题",
+                unknown_caller: "未知来电", calling: "正在通话...", decline: "拒绝", accept: "接受", security_override: "安全覆盖：点击拒绝100次或等待10秒。",
+                system_btn: "系统", user_session: "用户会话", dark_mode: "深色模式", location_override: "位置覆盖",
+                notifs: ["收到新邮件", "存储空间几乎已满", "安全警报", "可用更新"],
+                callers: ["老板", "妈妈", "未知号码", "系统管理员"],
+                subs: [
+                    "[埃里克]：你好？请听我说。",
+                    "[埃里克]：他们追踪到了我最后的封包。我时间不多了。",
+                    "[埃里克]：要结束这场噩梦，你需要完整的序列。",
+                    "[埃里克]：就在这里：1.TERMINATE, 2.FLUSH, 3.WIPE, 4.VOID, 5.GONE。",
+                    "[埃里克]：请准确输入。不要让黄衣王阻止你。",
+                    "[埃里克]：再见。我希望有人能发现这个。"
+                ]
+            },
+            "PH": {
+                quiz_label: "Pagsusulit.exe", terminal_label: "Terminal", readme_label: "Basahin.txt", browser_label: "Browser", settings_label: "Settings", themes_label: "Tema",
+                unknown_caller: "Hindi Kilalang Tumatawag", calling: "Tumatawag...", decline: "TANGGIHAN", accept: "TANGGAPIN", security_override: "Security override: I-click ang Tanggihan ng 100 beses o maghintay ng 10s.",
+                system_btn: "SYSTEM", user_session: "User Session", dark_mode: "Dark Mode", location_override: "Lokasyon Override",
+                notifs: ["Bagong Email", "Malapit na Mapuno ang Storage", "Security Alert", "May Update"],
+                callers: ["Boss", "Nanay", "Hindi Kilalang Numero", "System Admin"],
+                subs: [
+                    "[ERIC]: Hello? Pakiusap, makinig ka.",
+                    "[ERIC]: Na-track nila ang huling packet ko. Wala na akong oras.",
+                    "[ERIC]: Para matapos ang bangungot na ito, kailangan mo ang buong sequence.",
+                    "[ERIC]: Heto na: 1.TERMINATE, 2.FLUSH, 3.WIPE, 4.VOID, 5.GONE.",
+                    "[ERIC]: I-type sila nang eksakto. Huwag hayaang pigilan ka ng Hari.",
+                    "[ERIC]: Paalam. Sana may makahanap nito."
+                ]
+            },
+            "CA": {
+                quiz_label: "Quiz.exe", terminal_label: "Terminal", readme_label: "README.txt", browser_label: "Navigateur", settings_label: "Paramètres", themes_label: "Thèmes",
+                unknown_caller: "Appel inconnu", calling: "Appel en cours...", decline: "REFUSER", accept: "ACCEPTER", security_override: "Contournement de sécurité: Cliquez 100 fois ou attendez 10s.",
+                system_btn: "SYSTÈME", user_session: "Session utilisateur", dark_mode: "Mode sombre", location_override: "Localisation",
+                notifs: ["Nouveau courriel", "Stockage presque plein", "Alerte de sécurité", "Mise à jour disponible"],
+                callers: ["Patron", "Maman", "Numéro inconnu", "Admin Système"],
+                subs: [
+                    "[ERIC]: Allô ? S'il vous plaît, écoutez-moi.",
+                    "[ERIC]: Ils ont tracé mon dernier paquet. Je n'ai plus beaucoup de temps.",
+                    "[ERIC]: Pour finir ce cauchemar, vous avez besoin de la séquence complète.",
+                    "[ERIC]: La voici : 1.TERMINATE, 2.FLUSH, 3.WIPE, 4.VOID, 5.GONE.",
+                    "[ERIC]: Tapez-les exactement. Ne laissez pas le Roi vous arrêter.",
+                    "[ERIC]: Adieu. J'espère que quelqu'un trouvera ceci."
+                ]
+            }
+        };
+
+        function playRingtone(isEmergency = false) {
+            if(isBSODActive) return;
+            const now = audioCtx.currentTime;
+            const sequence = isEmergency ? [330, 220, 330, 220] : [440, 554, 659, 880, 659, 554];
+            sequence.forEach((f, i) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.type = isEmergency ? "sawtooth" : "triangle";
+                o.frequency.value = f;
+                o.connect(g); g.connect(audioCtx.destination);
+                g.gain.setValueAtTime(masterVolume * (isEmergency ? 0.12 : 0.08), now + i*0.15);
+                g.gain.exponentialRampToValueAtTime(0.00001, now + i*0.15 + 0.1);
+                o.start(now + i*0.15); o.stop(now + i*0.15 + 0.1);
+            });
+        }
+
+        function triggerBSODSound() {
+            const now = audioCtx.currentTime;
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = "sawtooth";
+            o.frequency.setValueAtTime(100, now);
+            o.frequency.linearRampToValueAtTime(50, now + 1);
+            o.connect(g); g.connect(audioCtx.destination);
+            g.gain.setValueAtTime(masterVolume * 0.2, now);
+            g.gain.linearRampToValueAtTime(0, now + 1);
+            o.start(); o.stop(now + 1);
+        }
+
+        function setTheme(theme) {
+            const desk = document.getElementById('desktop');
+            if (theme === 'green') desk.style.background = 'var(--bg-gradient)';
+            if (theme === 'orange') desk.style.background = 'var(--bg-gradient-orange)';
+            if (theme === 'violet') desk.style.background = 'var(--bg-gradient-violet)';
+            beep(400, 50);
+        }
+
+        function beep(f, d, type="sine") {
+            if(isBSODActive) return;
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = type;
+            o.connect(g); g.connect(audioCtx.destination);
+            o.frequency.value = f;
+            g.gain.setValueAtTime(masterVolume * 0.15, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + d/1000);
+            o.start(); o.stop(audioCtx.currentTime + d/1000);
+        }
+
+        function triggerSuccess() {
+            if(isBSODActive) return;
+            currentQ++;
+            beep(600, 100);
+            const content = document.getElementById('quiz-content');
+            content.classList.add('success-flash');
+            setTimeout(() => content.classList.remove('success-flash'), 500);
+            if(currentQ < questions.length) loadQuestion(); else win();
+        }
+
+        function spawnAd() {
+            if (isBSODActive || isGameWon || isEricCalling || isFinalBookSequence) return;
+            
+            if (Math.random() < 0.1) {
+                if (Math.random() < 0.25) {
+                    triggerCall();
+                    return;
+                }
+
+                const isPortrait = window.innerHeight > window.innerWidth;
+                const isMobileView = window.innerWidth <= 768;
+
+                if (isMobileView && isPortrait) {
+                    triggerNotification();
+                } else {
+                    const ad = document.createElement('div');
+                    ad.className = "ad-window p-2 font-bold text-[10px] flex flex-col items-center justify-center text-center";
+                    ad.style.top = Math.random() * (window.innerHeight - 150) + "px";
+                    ad.style.left = Math.random() * (window.innerWidth - 150) + "px";
+                    const phrases = (LANG_MAP[vpnLocation] || LANG_MAP["US"]).ads || LANG_MAP["US"].ads;
+                    const msg = phrases[Math.floor(Math.random() * phrases.length)];
+                    ad.innerHTML = `
+                        <div class="w-full flex justify-end mb-1 cursor-move ad-handle"><button class="bg-black text-white px-1" onclick="this.parentElement.parentElement.remove()">X</button></div>
+                        <p class="mb-2">${msg}</p>
+                        <button class="bg-blue-600 text-white p-1 w-full text-[8px]" onclick="triggerBSOD('MALWARE_INSTALL_FAIL', true)">BUY NOW</button>
+                    `;
+                    document.body.appendChild(ad);
+                    makeAdDraggable(ad);
+                    beep(800, 20, "square");
+                }
+            }
+        }
+
+        let eventLoopTimer = setInterval(() => { spawnAd(); }, 10000);
+
+        function handleNotificationClick() {
+            if (notifEl.classList.contains('final-notif')) {
+                notifEl.classList.remove('active', 'final-notif');
+                startEssayQuiz();
+            } else {
+                notifEl.classList.remove('active');
+                toggleWindow('browser-window');
+                navigateBrowser('https://cdn.possible-os.net/dl/update-pack.exe');
+                setTimeout(() => {
+                    triggerBSOD("UNTRUSTED_EXECUTION_NODE_BREACH", true);
+                }, 3000);
+            }
+        }
+
+        let touchStartY = 0;
+        const notifEl = document.getElementById('mobile-notification');
+        notifEl.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientX; }, {passive: true});
+        notifEl.addEventListener('touchend', (e) => {
+            let diff = e.changedTouches[0].clientX - touchStartY;
+            if (Math.abs(diff) > 50) {
+                notifEl.classList.remove('active');
+                beep(300, 50);
+            }
+        });
+
+        function triggerNotification() {
+            const body = document.getElementById('notif-body');
+            const title = document.getElementById('notif-title');
+            const iconBg = document.getElementById('notif-icon-bg');
+            const iconEl = document.getElementById('notif-icon');
+            
+            const locale = LANG_MAP[vpnLocation] || LANG_MAP["US"];
+            const notifs = locale.notifs;
+            const chosen = notifs[Math.floor(Math.random() * notifs.length)];
+            
+            body.textContent = chosen;
+            title.textContent = vpnLocation === "US" ? "System Alert" : (locale.system_btn || "System");
+            
+            const colors = ['bg-blue-500', 'bg-red-500', 'bg-yellow-500', 'bg-green-500'];
+            const icons = ['message-circle', 'alert-triangle', 'bell', 'shield'];
+            
+            iconBg.className = `${colors[Math.floor(Math.random() * colors.length)]} p-2 rounded-lg`;
+            iconEl.setAttribute('data-lucide', icons[Math.floor(Math.random() * icons.length)]);
+            lucide.createIcons();
+            
+            notifEl.classList.add('active');
+            beep(1000, 50);
+            setTimeout(() => { if (!notifEl.classList.contains('final-notif')) notifEl.classList.remove('active') }, 5000);
+        }
+
+        function triggerCall() {
+            const call = document.getElementById('mobile-call');
+            const callerEl = document.getElementById('caller-name');
+            const locale = LANG_MAP[vpnLocation] || LANG_MAP["US"];
+            callerEl.textContent = locale.callers[Math.floor(Math.random() * locale.callers.length)];
+            
+            call.style.display = 'flex';
+            document.getElementById('subtitles').style.display = 'none';
+            document.getElementById('accept-call-btn').onclick = () => triggerBSOD('USER_ACCEPTED_UNKNOWN_CALL', true);
+            document.getElementById('decline-call-btn').style.pointerEvents = 'auto';
+            document.getElementById('security-override-text').style.opacity = '1';
+
+            declineClickCount = 0;
+            callStartTime = Date.now();
+            const ringtone = setInterval(() => {
+                if(call.style.display === 'flex' && !isBSODActive && !isEricCalling) playRingtone();
+            }, 1500);
+            setTimeout(() => {
+                if(!isEricCalling) {
+                    call.style.display = 'none';
+                    clearInterval(ringtone);
+                }
+            }, 15000);
+        }
+
+        function handleDeclineClick() {
+            if (isEricCalling) return;
+            declineClickCount++;
+            const elapsed = (Date.now() - callStartTime) / 1000;
+            if (declineClickCount >= 100 || elapsed >= 10) {
+                document.getElementById('mobile-call').style.display = 'none';
+                beep(400, 100);
+            } else {
+                beep(100, 20, "sawtooth");
+            }
+        }
+
+        function makeAdDraggable(el) {
+            const handle = el.querySelector('.ad-handle');
+            const onStart = (e) => {
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                let offsetX = clientX - el.getBoundingClientRect().left;
+                let offsetY = clientY - el.getBoundingClientRect().top;
+                const onMove = (e) => {
+                    const moveX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                    const moveY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                    el.style.left = (moveX - offsetX) + "px";
+                    el.style.top = (moveY - offsetY) + "px";
+                };
+                const onEnd = () => {
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('touchmove', onMove);
+                };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('touchmove', onMove, {passive:false});
+                document.addEventListener('mouseup', onEnd);
+                document.addEventListener('touchend', onEnd);
+            };
+            handle.addEventListener('mousedown', onStart);
+            handle.addEventListener('touchstart', onStart, {passive:false});
+        }
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            document.getElementById('toggle-dark').classList.toggle('on', isDarkMode);
+            beep(400, 50);
+        }
+
+        function changeVPN(loc) {
+            vpnLocation = loc;
+            const dict = LANG_MAP[loc] || LANG_MAP["US"];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) el.innerHTML = dict[key];
+            });
+            loadQuestion();
+            updateTaskbar();
+            beep(500, 100);
+        }
+
+        function triggerBSOD(err, timed = false, isGsod = false) {
+            isBSODActive = true;
+            const bsod = document.getElementById('bsod-screen');
+            const face = document.getElementById('bsod-face');
+            const rebootBtn = document.getElementById('bsod-reboot-btn');
+            const countdownEl = document.getElementById('bsod-countdown');
+            
+            triggerBSODSound();
+            bsod.className = isGsod ? "bsod gsod" : "bsod";
+            face.textContent = isGsod ? ":)" : ":(";
+            document.getElementById('bsod-error').textContent = `ERROR_CODE: ${err}`;
+            bsod.style.display = 'flex';
+            
+            beep(120, 1000, "sawtooth");
+
+            if(isGsod) {
+                rebootBtn.style.color = "#00aa00";
+            } else {
+                rebootBtn.style.color = "#0000aa";
+            }
+
+            if(timed) {
+                rebootBtn.style.display = 'none';
+                countdownEl.style.display = 'block';
+                let tl = 60;
+                countdownEl.textContent = `REBOOTING IN ${tl}s`;
+                const iv = setInterval(() => {
+                    tl--; 
+                    countdownEl.textContent = `REBOOTING IN ${tl}s`;
+                    if(tl <= 0 || !isBSODActive) { 
+                        clearInterval(iv); 
+                        if(isBSODActive) rebootSystem(); 
+                    }
+                }, 1000);
+            } else {
+                rebootBtn.style.display = 'block';
+                countdownEl.style.display = 'none';
+            }
+        }
+
+        function rebootSystem() {
+            isBSODActive = true;
+            document.getElementById('bsod-screen').style.display = 'none';
+            const overlay = document.getElementById('reboot-overlay');
+            const bar = document.getElementById('reboot-bar');
+            overlay.classList.add('active');
+            let p = 0;
+            const iv = setInterval(() => {
+                p += 2; bar.style.width = p + "%";
+                if(p >= 100) {
+                    clearInterval(iv);
+                    overlay.classList.remove('active');
+                    resetOSState();
+                }
+            }, 50);
+        }
+
+        function performSoftReboot(callback) {
+            const overlay = document.getElementById('reboot-overlay');
+            const bar = document.getElementById('reboot-bar');
+            overlay.classList.add('active');
+            let p = 0;
+            const iv = setInterval(() => {
+                p += 5; bar.style.width = p + "%";
+                if(p >= 100) {
+                    clearInterval(iv);
+                    overlay.classList.remove('active');
+                    if(callback) callback();
+                    document.getElementById('term-output').innerHTML = "";
+                    terminalInitialised = false;
+                    document.querySelectorAll('.ad-window').forEach(a => a.remove());
+                }
+            }, 50);
+        }
+
+        function resetOSState() {
+            isBSODActive = false;
+            lives = 3; currentQ = 0;
+            isWifiConnected = true;
+            terminalInitialised = false;
+            isSnakeRampageActive = false;
+            isEricCalling = false;
+            isEssayMode = false;
+            document.getElementById('wifi-icon').style.color = '#4ade80';
+            document.querySelectorAll('.window').forEach(w => w.classList.add('hidden'));
+            document.querySelectorAll('.ad-window').forEach(a => a.remove());
+            document.querySelectorAll('.chaos-snake').forEach(s => s.remove());
+            document.getElementById('lives').textContent = "♥♥♥";
+            document.getElementById('term-output').innerHTML = "";
+            document.getElementById('mobile-call').style.display = 'none';
+            
+            document.querySelectorAll('.desktop-icon').forEach(icon => {
+                icon.style.opacity = "1";
+                icon.style.pointerEvents = "auto";
+            });
+
+            if (isBrowserUpdated && globalSnakeScore >= 10) {
+                document.body.classList.add('transcendence-mode');
+                document.getElementById('desktop').style.background = 'var(--bg-gradient-won)';
+                document.getElementById('greeting-text').textContent = "[REDACTED]";
+                document.getElementById('terminal-input').classList.add('redacted-input');
+                if(document.getElementById('icon-themes')) document.getElementById('icon-themes').remove();
+                toggleDarkMode();
+                setupWonReadme();
+                setupAnonymousFiles();
+            } else if (hasStarvedSnakeError) {
+                document.body.classList.remove('transcendence-mode');
+                document.getElementById('desktop').style.background = 'var(--bg-gradient)';
+            } else {
+                document.body.classList.remove('transcendence-mode');
+            }
+
+            if (isGameWon) {
+                const qIcon = document.getElementById('icon-quiz');
+                if (qIcon && !isEssayMode) qIcon.remove();
+            }
+            
+            loadQuestion();
+        }
+
+        function setupAnonymousFiles() {
+            const desktop = document.getElementById('desktop');
+            if(!document.getElementById('icon-hi')) {
+                const hiIcon = document.createElement('div');
+                hiIcon.className = "desktop-icon";
+                hiIcon.id = "icon-hi";
+                hiIcon.onclick = () => openAnonymousFile('hi');
+                hiIcon.innerHTML = `<div class="icon-box"><i data-lucide="file-text" class="w-6 h-6 text-blue-300"></i></div><span>hi.txt</span>`;
+                desktop.appendChild(hiIcon);
+            }
+            if(!document.getElementById('icon-mylife')) {
+                const lifeIcon = document.createElement('div');
+                lifeIcon.className = "desktop-icon";
+                lifeIcon.id = "icon-mylife";
+                lifeIcon.onclick = () => openAnonymousFile('mylife');
+                lifeIcon.innerHTML = `<div class="icon-box"><i data-lucide="file-text" class="w-6 h-6 text-red-400"></i></div><span>mylife.txt</span>`;
+                desktop.appendChild(lifeIcon);
+            }
+            lucide.createIcons();
+            initIconPositions();
+            makeIconsDraggable();
+        }
+
+        function openReadmeFile() {
+            if(isBSODActive || isFinalBookSequence) return;
+            if (isBrowserUpdated && globalSnakeScore >= 10 && !isEssayMode) {
+                const win = document.getElementById('readme-window');
+                if (!win.classList.contains('hidden')) { hideWindow('readme-window'); return; }
+                setupWonReadme();
+                win.classList.remove('hidden');
+                win.style.zIndex = ++highestZ;
+                updateTaskbar();
+                beep(400, 50);
+            } else {
+                toggleWindow('readme-window');
+            }
+        }
+
+        function openAnonymousFile(type) {
+            const win = document.getElementById('readme-window');
+            const title = document.getElementById('readme-header-title');
+            const body = document.getElementById('readme-body');
+            const footer = document.getElementById('readme-footer');
+            
+            win.classList.remove('hidden');
+            win.style.zIndex = ++highestZ;
+            footer.classList.add('hidden');
+
+            if(type === 'hi') {
+                title.textContent = ANONYMOUS_LORE.hi.title;
+                body.innerHTML = ANONYMOUS_LORE.hi.content;
+            } else if(type === 'mylife') {
+                footer.classList.remove('hidden');
+                currentReadmePage = 0;
+                updateMyLifeContent();
+                
+                document.getElementById('readme-next-btn').onclick = () => {
+                    if (currentReadmePage < ANONYMOUS_LORE.mylife.length - 1) {
+                        currentReadmePage++;
+                        updateMyLifeContent();
+                    }
+                };
+                document.getElementById('readme-prev-btn').onclick = () => {
+                    if (currentReadmePage > 0) {
+                        currentReadmePage--;
+                        updateMyLifeContent();
+                    }
+                };
+            }
+            updateTaskbar();
+            beep(400, 50);
+        }
+
+        function updateMyLifeContent() {
+            const log = ANONYMOUS_LORE.mylife[currentReadmePage];
+            document.getElementById('readme-header-title').textContent = log.title;
+            document.getElementById('readme-body').innerHTML = log.content();
+            document.getElementById('readme-page-num').textContent = `PAGE ${currentReadmePage + 1}/${ANONYMOUS_LORE.mylife.length}`;
+            
+            const nextBtn = document.getElementById('readme-next-btn');
+            const prevBtn = document.getElementById('readme-prev-btn');
+            prevBtn.style.opacity = (currentReadmePage === 0) ? "0.3" : "1";
+            nextBtn.style.opacity = (currentReadmePage === ANONYMOUS_LORE.mylife.length - 1) ? "0.3" : "1";
+            beep(400, 30);
+        }
+
+        function setupWonReadme() {
+            const footer = document.getElementById('readme-footer');
+            footer.classList.remove('hidden');
+            currentReadmePage = 0;
+            updateReadmeContent();
+            
+            document.getElementById('readme-next-btn').onclick = () => {
+                if (currentReadmePage < README_LOGS.length - 1) {
+                    currentReadmePage++;
+                    updateReadmeContent();
+                }
+            };
+
+            document.getElementById('readme-prev-btn').onclick = () => {
+                if (currentReadmePage > 0 && currentReadmePage < 2) {
+                    currentReadmePage--;
+                    updateReadmeContent();
+                }
+            };
+        }
+
+        function updateReadmeContent() {
+            const log = README_LOGS[currentReadmePage];
+            document.getElementById('readme-header-title').textContent = log.title;
+            document.getElementById('readme-body').innerHTML = log.content;
+            document.getElementById('readme-page-num').textContent = `PAGE ${currentReadmePage + 1}/${README_LOGS.length}`;
+            
+            const nextBtn = document.getElementById('readme-next-btn');
+            const prevBtn = document.getElementById('readme-prev-btn');
+            
+            prevBtn.style.opacity = (currentReadmePage === 0 || currentReadmePage === 2) ? "0.3" : "1";
+            nextBtn.style.opacity = (currentReadmePage === README_LOGS.length - 1) ? "0.3" : "1";
+
+            if (currentReadmePage === 2 && !isEricCalling) {
+                setTimeout(triggerEricSequence, 5000);
+            }
+            beep(400, 30);
+        }
+
+        function triggerEricSequence() {
+            if (isEricCalling) return;
+            hideWindow('readme-window');
+            isEricCalling = true;
+            const call = document.getElementById('mobile-call');
+            const callerEl = document.getElementById('caller-name');
+            const sub = document.getElementById('subtitles');
+            
+            callerEl.textContent = "Eric";
+            call.style.display = 'flex';
+            sub.style.display = 'block';
+            sub.textContent = "";
+            
+            document.getElementById('decline-call-btn').style.pointerEvents = 'none';
+            document.getElementById('security-override-text').style.opacity = '0';
+            
+            const acceptBtn = document.getElementById('accept-call-btn');
+            const ringtone = setInterval(() => {
+                if(call.style.display === 'flex' && isEricCalling && !isBSODActive) playRingtone(true);
+            }, 1200);
+
+            acceptBtn.onclick = () => {
+                clearInterval(ringtone);
+                beep(200, 50);
+                startSubtitles();
+                acceptBtn.onclick = null;
+                acceptBtn.classList.add('opacity-30');
+            };
+        }
+
+        async function startSubtitles() {
+            const locale = LANG_MAP[vpnLocation] || LANG_MAP["US"];
+            let lines = triggeredAltEnd ? locale.subs : (locale.subs_alt || LANG_MAP["US"].subs_alt);
+            
+            const sub = document.getElementById('subtitles');
+            for(let line of lines) {
+                sub.textContent = "";
+                for(let char of line) {
+                    sub.textContent += char;
+                    beep(Math.random() * 50 + 70, 10, "sawtooth");
+                    await new Promise(r => setTimeout(r, 40));
+                }
+                await new Promise(r => setTimeout(r, 1500));
+            }
+            sub.textContent = "[SIGNAL LOST]";
+            beep(200, 500, "sawtooth");
+            setTimeout(() => {
+                document.getElementById('mobile-call').style.display = 'none';
+                triggerThankYouNotif();
+            }, 1000);
+        }
+
+        function triggerThankYouNotif() {
+            const body = document.getElementById('notif-body');
+            const title = document.getElementById('notif-title');
+            body.textContent = "PossibleOS would like to thank you for your time on our OS. Click here for a quiz that helps us keep going.";
+            title.textContent = "Official Message";
+            notifEl.classList.add('active', 'final-notif');
+            beep(1000, 100);
+        }
+
+        function startEssayQuiz() {
+            isEssayMode = true;
+            const desk = document.getElementById('desktop');
+            if (!document.getElementById('icon-quiz')) {
+                const quizIcon = document.createElement('div');
+                quizIcon.className = "desktop-icon";
+                quizIcon.id = "icon-quiz";
+                quizIcon.onclick = () => toggleWindow('quiz-window');
+                quizIcon.innerHTML = `<div class="icon-box"><i data-lucide="zap" class="w-6 h-6 text-yellow-500"></i></div><span>Quiz.exe</span>`;
+                desk.appendChild(quizIcon);
+                lucide.createIcons();
+                initIconPositions();
+                makeIconsDraggable();
+            }
+
+            originalReadmeContent = document.getElementById('readme-body').innerHTML;
+            document.getElementById('readme-header-title').textContent = "README.txt";
+            document.getElementById('readme-body').innerHTML = `
+                <p class="font-bold border-b-2 border-black mb-3">QUIZ INSTRUCTIONS</p>
+                <p class="text-xs">Please open Quiz.exe to complete the mandatory experience feedback survey. Your input is valuable for our growth.</p>
+            `;
+            document.getElementById('readme-footer').classList.add('hidden');
+            
+            toggleWindow('quiz-window');
+            loadQuestion();
+        }
+
+        async function showChat(msg) {
+            if (isChatting) return;
+            isChatting = true;
+            const chat = document.getElementById('minecraft-chat');
+            chat.textContent = "";
+            chat.style.display = 'block';
+            for(let char of msg) {
+                chat.textContent += char;
+                beep(80, 15, "square");
+                await new Promise(r => setTimeout(r, 60));
+            }
+            await new Promise(r => setTimeout(r, 2000));
+            isChatting = false;
+        }
+
+        function startBookSequence() {
+            isFinalBookSequence = true;
+            document.body.classList.add('interaction-lock');
+            let currentPage = 0;
+            const container = document.getElementById('book-content');
+            const scrollBox = document.getElementById('book-container');
+            const footer = document.getElementById('book-page-footer');
+
+            const remarks = [
+                { time: 2000, msg: "<Anonymous> Well, this is strange." },
+                { time: 10000, msg: "<Anonymous> This book looks... wrong." },
+                { page: 1, msg: "<Anonymous> Wow." },
+                { page: 2, msg: "<Anonymous> This is getting creepy." },
+                { page: 3, msg: "<Anonymous> wat dat" },
+                { page: 4, msg: "<Anonymous> Interesting." },
+                { page: 5, msg: "<Anonymous> I shouldn't be reading this." }
+            ];
+
+            const loadPage = async (idx) => {
+                currentPage = idx;
+                container.innerHTML = BOOK_PAGES[idx];
+                footer.textContent = `Page ${idx + 1}`;
+                scrollBox.scrollTop = 0;
+                
+                let scrollInterval;
+                scrollInterval = setInterval(() => {
+                    scrollBox.scrollTop += Math.random() * 2 + 0.5;
+                }, 50 + Math.random() * 50);
+
+                const r = remarks.find(item => item.page === idx);
+                if (r) await showChat(r.msg);
+
+                if (idx === 7) {
+                    setTimeout(async () => {
+                        clearInterval(scrollInterval);
+                        await showChat("<Anonymous> ...");
+                        setTimeout(finalPanicSequence, 3000);
+                    }, 5000);
+                } else {
+                    const delay = Math.random() * (12000 - 8000) + 8000;
+                    setTimeout(() => {
+                        clearInterval(scrollInterval);
+                        loadPage(idx + 1);
+                    }, delay);
+                }
+            };
+
+            const startRemarks = remarks.filter(r => r.time);
+            startRemarks.forEach(r => setTimeout(() => showChat(r.msg), r.time));
+
+            loadPage(0);
+        }
+
+        async function finalPanicSequence() {
+            const chat = document.getElementById('minecraft-chat');
+            chat.style.display = 'none';
+
+            document.body.classList.remove('transcendence-mode');
+            document.body.classList.add('interaction-lock');
+            document.getElementById('greeting-text').textContent = "User Session";
+            document.getElementById('terminal-input').classList.remove('redacted-input');
+            if (isDarkMode) toggleDarkMode();
+
+            hideWindow('browser-window');
+            beep(200, 50);
+
+            await new Promise(r => setTimeout(r, 1200));
+            toggleWindow('term-window');
+
+            const typeCmd = async (cmd, delay=70) => {
+                const input = document.getElementById('terminal-input');
+                input.value = "";
+                for(let char of cmd) {
+                    input.value += char;
+                    beep(Math.random() * 40 + 60, 15, "sawtooth");
+                    await new Promise(r => setTimeout(r, delay));
+                }
+                await new Promise(r => setTimeout(r, 500));
+                processTerminal(input.value, true);
+            };
+
+            await new Promise(r => setTimeout(r, 1500));
+            await typeCmd("downgrade");
+            printToTerminal("SYSTEM_CORE: ROLLING BACK EXPLORER PROTOCOLS...", "#aaa");
+            await new Promise(r => setTimeout(r, 800));
+            beep(100, 50, "square");
+            printToTerminal("BROWSER DOWNGRADED TO VERSION 0.1a (TEXT-ONLY MODE)", "#4ade80");
+
+            await new Promise(r => setTimeout(r, 1200));
+            await typeCmd("theme change cream green");
+            document.getElementById('desktop').style.background = 'var(--bg-gradient)';
+            printToTerminal("WALLPAPER_LAYER: THEME_RESTORED_CREAM_GREEN", "#4ade80");
+
+            await new Promise(r => setTimeout(r, 1000));
+            await typeCmd("delete quiz.exe");
+            printToTerminal("UNLINKING Quiz.exe FROM KERNEL...", "#aaa");
+            await new Promise(r => setTimeout(r, 600));
+            printToTerminal("FILE DELETED.", "#4ade80");
+
+            await new Promise(r => setTimeout(r, 1200));
+            await typeCmd("reinstall quiz.exe");
+            printToTerminal("FETCHING CLEAN BINARY FROM CACHE...", "#aaa");
+            await new Promise(r => setTimeout(r, 800));
+            printToTerminal("Quiz.exe INSTALLED.", "#4ade80");
+
+            await new Promise(r => setTimeout(r, 1500));
+            await typeCmd("TERMINATE");
+            printToTerminal("PROCESS_TERMINATED: HASTUR_ROOT", "#f00");
+            
+            await new Promise(r => setTimeout(r, 800));
+            await typeCmd("FLUSH");
+            printToTerminal("MEMORY_PURGE: OK", "#f00");
+
+            if (triggeredAltEnd) {
+                await new Promise(r => setTimeout(r, 800));
+                await typeCmd("WIPE");
+                printToTerminal("WIPE_SECTORS: DONE", "#f00");
+                await new Promise(r => setTimeout(r, 800));
+                await typeCmd("VOID");
+                printToTerminal("VOID_RECON: OK", "#f00");
+            }
+
+            await new Promise(r => setTimeout(r, 1000));
+            await typeCmd("EXIT");
+            printToTerminal("SIGNAL_INTERRUPT: EXITING VIRTUAL MACHINE...", "#f00");
+
+            await new Promise(r => setTimeout(r, 1200));
+            const input = document.getElementById('terminal-input');
+            const finalCmd = "GONE";
+            for(let i=0; i<finalCmd.length; i++) {
+                input.value += finalCmd[i];
+                beep(60, 20, "sawtooth");
+                await new Promise(r => setTimeout(r, 100));
+            }
+
+            beep(40, 1000, "sawtooth");
+            document.body.style.background = "black";
+            document.querySelectorAll('.window').forEach(w => w.style.display = 'none');
+            
+            setTimeout(() => {
+                if (triggeredAltEnd) document.getElementById('final-title-text').textContent = "alternate ending";
+                const finalScreen = document.getElementById('black-out-final');
+                const finalBtn = document.getElementById('final-reboot-btn');
+                
+                finalBtn.textContent = KING_QUOTES[Math.floor(Math.random() * KING_QUOTES.length)];
+                
+                finalScreen.style.display = 'flex';
+                finalScreen.style.opacity = '0';
+                let op = 0;
+                const fade = setInterval(() => {
+                    op += 0.05;
+                    finalScreen.style.opacity = op;
+                    if(op >= 1) {
+                        clearInterval(fade);
+                        finalBtn.classList.remove('pointer-events-none');
+                        finalBtn.style.opacity = '1';
+                    }
+                }, 100);
+            }, 1000);
+        }
+
+        function applyBrowserPatchUI() {
+            const addressBar = document.querySelector('.browser-address-bar');
+            addressBar.innerHTML = `<i data-lucide="globe" class="w-3 h-3 text-blue-400"></i><input type="text" id="browser-url-input" class="bg-transparent outline-none w-full" value="https://www.possible-search.net">`;
+            lucide.createIcons();
+            document.getElementById('browser-error-view').classList.add('hidden');
+            document.getElementById('snake-view').classList.add('hidden');
+            document.getElementById('web-view').classList.remove('hidden');
+            navigateBrowser("https://www.possible-search.net");
+
+            const urlInput = document.getElementById('browser-url-input');
+            urlInput.onkeydown = (e) => {
+                if (e.key === 'Enter') navigateBrowser(urlInput.value);
+            };
+        }
+
+        async function navigateBrowser(url) {
+            if (!url.startsWith('http')) url = 'https://' + url;
+            const webView = document.getElementById('web-view');
+            const urlInput = document.getElementById('browser-url-input');
+            if (urlInput) urlInput.value = url;
+            
+            webView.classList.remove('hidden');
+            document.getElementById('browser-error-view').classList.add('hidden');
+            document.getElementById('snake-view').classList.add('hidden');
+            
+            if (url === "https://www.thekingsavesusall.net") {
+                webView.innerHTML = MOCK_SITES[url];
+                await showChat("<Anonymous> Wait, what am i doing?");
+                
+                setTimeout(async () => {
+                    hideWindow('browser-window');
+                    document.getElementById('minecraft-chat').style.display = 'none';
+                    triggeredAltEnd = true;
+                    
+                    await new Promise(r => setTimeout(r, 800));
+                    toggleWindow('term-window');
+                    
+                    await new Promise(r => setTimeout(r, 1000));
+                    printToTerminal("CREATING TASK: CALL_ERIC_ON_READ.SH", "#4ade80");
+                    await new Promise(r => setTimeout(r, 1200));
+                    printToTerminal("INJECTING CODE BLOCK...", "#4ade80");
+                    await new Promise(r => setTimeout(r, 800));
+                    printToTerminal("FILE SAVED.", "#4ade80");
+                }, 500);
+                return;
+            }
+
+            if (MOCK_SITES[url]) {
+                webView.innerHTML = MOCK_SITES[url];
+                if (url === "https://www.possible.com") {
+                    startBookSequence();
+                }
+                beep(400, 50);
+            } else {
+                webView.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-zinc-400">
+                        <i data-lucide="file-warning" class="w-12 h-12 mb-4"></i>
+                        <h2 class="text-xl font-bold">404 - Not Found</h2>
+                        <p>The requested URL could not be retrieved from the simulated cloud.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                beep(200, 100, "sawtooth");
+            }
+        }
+
+        function handleRestart() {
+            if (globalSnakeScore >= 10) {
+                isBrowserUpdated = true;
+                triggerBSOD('KERNEL_UPGRADE_REBOOT', false, true);
+            } else {
+                if (isSnakeRampageActive) return;
+                hasStarvedSnakeError = true;
+                triggerBSOD('KERNEL_STARVATION_REBOOT', false);
+            }
+        }
+
+        function toggleWindow(id) {
+            if(isBSODActive || isFinalBookSequence) return;
+            const win = document.getElementById(id);
+            if (!win.classList.contains('hidden')) { hideWindow(id); return; }
+            win.classList.remove('hidden');
+            win.style.zIndex = ++highestZ;
+            if(id === 'settings-window') startDino();
+            if(id === 'term-window' && !terminalInitialised) startTerminalSequence();
+            beep(400, 50);
+            updateTaskbar();
+        }
+
+        function hideWindow(id) {
+            const win = document.getElementById(id);
+            if (!win) return;
+            
+            if (id === 'browser-window') {
+                snakeGameRunning = false;
+            }
+
+            setTimeout(() => {
+                win.classList.add('hidden');
+                updateTaskbar();
+            }, 100);
+            beep(200, 50);
+        }
+
+        function goHome() {
+            if(isBSODActive || isFinalBookSequence) return;
+            document.getElementById('task-switcher').classList.add('hidden');
+            document.querySelectorAll('.window').forEach(win => hideWindow(win.id));
+            updateTaskbar();
+            beep(200, 50);
+        }
+
+        function goBack() {
+            if(isBSODActive || isFinalBookSequence) return;
+            const browser = document.getElementById('browser-window');
+            if (!browser.classList.contains('hidden')) {
+                resetBrowser();
+                beep(200, 50);
+                return;
+            }
+            beep(100, 50);
+        }
+
+        function openAppsList() {
+            if(isBSODActive || isFinalBookSequence) return;
+            const switcher = document.getElementById('task-switcher');
+            if(!switcher.classList.contains('hidden')) { switcher.classList.add('hidden'); return; }
+            switcher.innerHTML = "";
+            document.querySelectorAll('.window:not(.hidden)').forEach(win => {
+                const name = win.getAttribute('data-appname');
+                const card = document.createElement('div');
+                card.className = "bg-white text-black p-4 flex flex-col items-center justify-center rounded-lg shadow-xl cursor-pointer";
+                card.innerHTML = `<span class="font-bold">${name}</span>`;
+                card.onclick = () => { win.style.zIndex = ++highestZ; switcher.classList.add('hidden'); };
+                switcher.appendChild(card);
+            });
+            switcher.classList.remove('hidden');
+            beep(500, 50);
+        }
+
+        function updateTaskbar() {
+            const container = document.getElementById('pc-running-apps');
+            if(!container) return;
+            container.innerHTML = "";
+            document.querySelectorAll('.window:not(.hidden)').forEach(win => {
+                const id = win.id;
+                let name = win.getAttribute('data-appname');
+                const dict = LANG_MAP[vpnLocation] || LANG_MAP["US"];
+                if (id === 'quiz-window') name = dict.quiz_label;
+                if (id === 'term-window') name = dict.terminal_label;
+                if (id === 'readme-window') name = dict.readme_label;
+                if (id === 'browser-window') name = dict.browser_label;
+                if (id === 'settings-window') name = dict.settings_label;
+                if (id === 'themes-window') name = dict.themes_label;
+
+                const div = document.createElement('div');
+                div.className = "px-3 py-1 bg-[#f2e8cf] border border-black text-[10px] font-bold font-mono cursor-pointer text-black";
+                div.textContent = name;
+                div.onclick = () => { win.style.zIndex = ++highestZ; };
+                container.appendChild(div);
+            });
+        }
+
+        function makeDraggable() {
+            document.querySelectorAll('.window').forEach(win => {
+                const header = win.querySelector('.window-header');
+                const onStart = (e) => {
+                    if (isBSODActive || isFinalBookSequence) return;
+                    if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) return;
+                    win.style.zIndex = ++highestZ;
+                    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                    let offsetX = clientX - win.getBoundingClientRect().left;
+                    let offsetY = clientY - win.getBoundingClientRect().top;
+                    const onMove = (e) => {
+                        const moveX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                        const moveY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                        win.style.left = (moveX - offsetX) + "px";
+                        win.style.top = (moveY - offsetY) + "px";
+                        win.style.bottom = 'auto'; win.style.right = 'auto'; win.style.transform = 'none';
+                    };
+                    const onEnd = () => {
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('touchmove', onMove);
+                    };
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('touchmove', onMove, { passive: false });
+                    document.addEventListener('mouseup', onEnd);
+                    document.addEventListener('touchend', onEnd);
+                };
+                header.addEventListener('mousedown', onStart);
+                header.addEventListener('touchstart', onStart, { passive: false });
+            });
+        }
+        makeDraggable();
+
+        const termOutput = document.getElementById('term-output');
+        function printToTerminal(text, color = "#0f0") {
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.className = "mb-1";
+            line.textContent = text.startsWith('>') ? text : `> ${text}`;
+            termOutput.appendChild(line);
+            termOutput.scrollTop = termOutput.scrollHeight;
+            beep(120, 10, "square");
+        }
+
+        function startTerminalSequence() {
+            terminalInitialised = true;
+            const lines = [
+                "POSSIBLE_OS KERNEL v3.2.0-STABLE",
+                "Copyright (C) 1988-2024 POSSIBLE CORP.",
+                "------------------------------------",
+                "CPU: PK-998 @ 4.2GHz (8 Cores active)",
+                "RAM: 65536KB OK",
+                "HD0: MASTER BOOT RECORD [VERIFIED]",
+                "NETWORK: DHCP ACQUIRED 192.168.1.101",
+                "MOUNTING SYSTEM DRIVE... [DONE]",
+                "LOADING DRIVERS... [DONE]",
+                "READY.",
+                "Type 'HELP' for instructions."
+            ];
+            let delay = 0;
+            lines.forEach(l => {
+                setTimeout(() => printToTerminal(l), delay);
+                delay += 80;
+            });
+        }
+
+        function runRestoreSequence() {
+            const overlay = document.getElementById('reboot-overlay');
+            const bar = document.getElementById('reboot-bar');
+            const text = document.getElementById('reboot-text');
+            const dict = LANG_MAP[vpnLocation] || LANG_MAP["US"];
+            overlay.classList.add('active');
+            text.textContent = dict.restoring;
+            let p = 0;
+            const duration = 15000;
+            const step = 100;
+            const inc = 100 / (duration / step);
+            
+            const iv = setInterval(() => {
+                p += inc;
+                bar.style.width = p + "%";
+                if(p >= 100) {
+                    clearInterval(iv);
+                    text.textContent = dict.restore_complete;
+                    setTimeout(() => {
+                        overlay.classList.remove('active');
+                        document.querySelectorAll('.desktop-icon').forEach(icon => {
+                            icon.style.opacity = "1";
+                            icon.style.pointerEvents = "auto";
+                        });
+
+                        if (!document.getElementById('icon-quiz')) {
+                            const quizIcon = document.createElement('div');
+                            quizIcon.className = "desktop-icon";
+                            quizIcon.id = "icon-quiz";
+                            quizIcon.onclick = () => toggleWindow('quiz-window');
+                            quizIcon.innerHTML = `<div class="icon-box"><i data-lucide="zap" class="w-6 h-6 text-yellow-500"></i></div><span data-i18n="quiz_label">Quiz.exe</span>`;
+                            document.getElementById('desktop').appendChild(quizIcon);
+                            lucide.createIcons();
+                            initIconPositions();
+                            makeIconsDraggable();
+                        }
+
+                        hasStarvedSnakeError = false;
+                        resetOSState();
+                        printToTerminal("ALL ASSETS RESTORED SUCCESSFULLY.", "#4ade80");
+                    }, 1000);
+                }
+            }, step);
+        }
+
+        function processTerminal(cmd, isAuto = false) {
+            if(isBSODActive || (isFinalBookSequence && !isAuto)) return;
+            const raw = cmd.trim().toLowerCase();
+            const input = document.getElementById('terminal-input');
+            printToTerminal(`$ ${cmd}`, "#aaa");
+            input.value = "";
+            
+            const recognized = ['help', 'info', 'reboot', 'clear', 'refresh', 'override', 'system', 'debug', 'restore', 'downgrade', 'theme', 'delete', 'reinstall', 'edit', 'terminate', 'flush', 'exit', 'wipe', 'void', 'looprestoration'];
+            const cmdMain = raw.split(' ')[0];
+
+            if (raw === 'help') {
+                printToTerminal("SYSTEM COMMAND LIST:");
+                printToTerminal("INFO     - Display architecture details");
+                printToTerminal("REBOOT   - Force system cycle");
+                printToTerminal("CLEAR    - Purge buffer");
+                printToTerminal("REFRESH  - Re-init sub-processes");
+                printToTerminal("OVERRIDE - Bypass security");
+                printToTerminal("SYSTEM   - Core OS call");
+                if (hasStarvedSnakeError) printToTerminal("RESTORE  - Reconstruct corrupted UI blocks");
+                printToTerminal("LOOPRESTORATION [file] - Attempt metadata healing");
+            } else if (raw.startsWith('looprestoration')) {
+                const arg = raw.split(' ')[1];
+                if(arg === 'mylife.txt') {
+                    if(!isGameWon && !isBrowserUpdated) {
+                        isLifeRestored = true;
+                        printToTerminal("HEALING METADATA FOR: mylife.txt", "#0ff");
+                        printToTerminal("RECONSTRUCTION SUCCESSFUL. CHANGES WILL PERSIST.", "#4ade80");
+                    } else {
+                        printToTerminal("ERROR: TARGET FILE NOT ACCESSIBLE IN THIS KERNEL STATE.", "#f00");
+                    }
+                } else {
+                    printToTerminal("ERROR: FILE NOT FOUND.", "#f00");
+                }
+            } else if (raw === 'info') {
+                printToTerminal("SYSTEM ARCHITECTURE: 64-BIT VIRTUALIZED");
+                printToTerminal("BUILD: 2024.08.15-RELEASE");
+                printToTerminal("UPTIME: " + Math.floor(performance.now()/1000) + "s");
+            } else if (raw === 'reboot') {
+                printToTerminal("INITIATING REBOOT...", "#f00");
+                setTimeout(rebootSystem, 500);
+            } else if (raw === 'clear') {
+                termOutput.innerHTML = "";
+            } else if (raw === 'refresh') {
+                if (questions[currentQ].answer === "REFRESH_TASK") {
+                    printToTerminal("LAUNCHING MANUAL PURGE UTILITY...");
+                    setTimeout(() => { toggleWindow('invaders-window'); startInvaders(); }, 1000);
+                } else {
+                    printToTerminal("ALL PROCESSES NORMAL.");
+                }
+            } else if (raw === 'override') {
+                if (questions[currentQ].answer === "CMD_OVERRIDE") {
+                    printToTerminal("SECURITY OVERRIDE AUTHORIZED.", "#4ade80");
+                    setTimeout(() => checkAnswer("CMD_OVERRIDE"), 1000);
+                } else {
+                    printToTerminal("ACCESS DENIED.", "#f00");
+                }
+            } else if (raw === 'system') {
+                printToTerminal("CALLING CORE MANAGEMENT... OK.");
+                checkAnswer("START_CLICKED");
+            } else if (raw === 'debug') {
+                printToTerminal("DEBUG MODE ACTIVATED. ELEVATING PRIVILEGES...", "#0ff");
+                isGameWon = true;
+                isBrowserUpdated = true;
+                isEssayMode = false;
+                globalSnakeScore = 10;
+                currentQ = questions.length;
+                document.getElementById('desktop').style.background = 'var(--bg-gradient-won)';
+                if(document.getElementById('icon-quiz')) document.getElementById('icon-quiz').remove();
+                if(document.getElementById('icon-themes')) document.getElementById('icon-themes').remove();
+                setupWonReadme();
+                setupAnonymousFiles();
+                applyBrowserPatchUI();
+                updateTaskbar();
+                printToTerminal("SYSTEM PATCHED. ENJOY THE VOID.");
+            } else if (raw === 'restore' && hasStarvedSnakeError) {
+                runRestoreSequence();
+            } else if (!isAuto && !recognized.includes(cmdMain)) {
+                printToTerminal(`'${raw}' not recognized.`, "#f00");
+            }
+        }
+
+        function disconnectInternet() {
+            isWifiConnected = false;
+            document.getElementById('wifi-icon').style.color = '#ef4444';
+            document.querySelectorAll('.ad-window').forEach(a => a.remove());
+            beep(200, 500, "sawtooth");
+        }
+
+        function startDino() {
+            const canvas = document.getElementById('dino-canvas');
+            const ctx = canvas.getContext('2d');
+            const scoreDisplay = document.getElementById('dino-score-display');
+            let dy = 70, vel = 0, isJumping = false;
+            let obstacleX = 380, score = 0;
+            let dinoGameActive = true;
+
+            function loop() {
+                if (isBSODActive || document.getElementById('settings-window').classList.contains('hidden')) {
+                    dinoGameActive = false;
+                    return;
+                }
+                ctx.fillStyle = "#18181b"; 
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = "#52525b";
+                ctx.beginPath(); ctx.moveTo(0, 85); ctx.lineTo(canvas.width, 85); ctx.stroke();
+                if (isJumping) {
+                    vel += 0.4; dy += vel;
+                    if (dy >= 70) { dy = 70; isJumping = false; vel = 0; }
+                }
+                ctx.fillStyle = "#22c55e"; ctx.fillRect(40, dy, 15, 15);
+                obstacleX -= (3 + (score / 50));
+                if (obstacleX < -20) {
+                    obstacleX = canvas.width + 50;
+                    score++;
+                    scoreDisplay.textContent = score.toString().padStart(3, '0');
+                    beep(800, 10, "triangle");
+                    if (score === 25) disconnectInternet();
+                }
+                ctx.fillStyle = "#ef4444"; ctx.fillRect(obstacleX, 70, 15, 15);
+                if (obstacleX < 55 && obstacleX > 25 && dy > 55) {
+                    beep(150, 100, "sawtooth");
+                    obstacleX = canvas.width + 50;
+                    score = 0;
+                    scoreDisplay.textContent = "000";
+                }
+                if(dinoGameActive) requestAnimationFrame(loop);
+            }
+            const handleJump = (e) => {
+                if(e.type === 'touchstart') e.preventDefault();
+                if(!isJumping){ isJumping = true; vel = -7; beep(400, 40); }
+            };
+            canvas.onmousedown = handleJump;
+            canvas.ontouchstart = handleJump;
+            loop();
+        }
+
+        let invadersGameRunning = false;
+        function startInvaders() {
+            if (invadersGameRunning) return;
+            invadersGameRunning = true;
+            const canvas = document.getElementById('invaders-canvas');
+            const ctx = canvas.getContext('2d');
+            let score = 0, px = canvas.width/2, bullets = [], enemies = [];
+            
+            function initEnemies() {
+                enemies = [];
+                for(let i=0; i<30; i++) {
+                    enemies.push({ x: (i%10)*40 + 40, y: Math.floor(i/10)*30 + 40, a: true, dir: 1 });
+                }
+            }
+            initEnemies();
+
+            function loop() {
+                if(isBSODActive || document.getElementById('invaders-window').classList.contains('hidden')) {
+                    invadersGameRunning = false;
+                    return; 
+                }
+
+                if (score >= 50) {
+                    invadersGameRunning = false;
+                    hideWindow('invaders-window');
+                    performSoftReboot(() => {
+                        checkAnswer("REFRESH_TASK");
+                    });
+                    return;
+                }
+
+                ctx.fillStyle = "#050505"; ctx.fillRect(0,0,canvas.width,canvas.height);
+                ctx.fillStyle = "#0f0"; ctx.fillRect(px-15, canvas.height-20, 30, 10);
+                ctx.fillRect(px-2, canvas.height-25, 4, 5);
+
+                let hitWall = false;
+                enemies.forEach(e => {
+                    if(e.a) {
+                        ctx.strokeStyle = "#0f0";
+                        ctx.strokeRect(e.x, e.y, 25, 15);
+                        e.x += e.dir * 0.5;
+                        if(e.x > canvas.width - 30 || e.x < 5) hitWall = true;
+                    }
+                });
+
+                if(hitWall) enemies.forEach(e => { e.dir *= -1; e.y += 10; });
+
+                bullets.forEach((b, i) => { 
+                    b.y -= 7; ctx.fillStyle = "#0f0"; ctx.fillRect(b.x, b.y, 2, 8);
+                    enemies.forEach(e => { 
+                        if(e.a && b.x > e.x && b.x < e.x+25 && b.y > e.y && b.y < e.y+15) { 
+                            e.a=false; bullets.splice(i,1); score+=5; 
+                            document.getElementById('invader-score').textContent = `SCORE: ${score.toString().padStart(3, '0')}`;
+                            beep(400, 20, "square");
+                        } 
+                    });
+                    if (b.y < 0) bullets.splice(i, 1);
+                });
+                requestAnimationFrame(loop);
+            }
+
+            const updatePos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                px = clientX - rect.left;
+                if (px < 15) px = 15; if (px > canvas.width - 15) px = canvas.width - 15;
+            };
+
+            canvas.onmousemove = updatePos;
+            canvas.ontouchmove = (e) => { e.preventDefault(); updatePos(e); };
+            canvas.onmousedown = () => { bullets.push({x: px, y: canvas.height-20}); beep(800, 20, "triangle"); };
+            canvas.ontouchstart = (e) => { e.preventDefault(); updatePos(e); bullets.push({x: px, y: canvas.height-20}); beep(800, 20, "triangle"); };
+            loop();
+        }
+
+        let snakeGameRunning = false, snake = [], food = {}, snakeDir = 'RIGHT', snakeScore = 0;
+        function showSnakeGame() {
+            document.getElementById('browser-error-view').classList.add('hidden');
+            document.getElementById('web-view').classList.add('hidden');
+            document.getElementById('snake-view').classList.remove('hidden');
+            document.getElementById('browser-url').textContent = 'local://cached/snake.html';
+            startSnake();
+        }
+
+        function resetBrowser() {
+            snakeGameRunning = false;
+            document.getElementById('browser-error-view').classList.remove('hidden');
+            document.getElementById('snake-view').classList.add('hidden');
+            document.getElementById('web-view').classList.add('hidden');
+            if (isBrowserUpdated) {
+                applyBrowserPatchUI();
+            } else {
+                document.getElementById('browser-url').textContent = 'https://www.possible-search.net';
+            }
+        }
+
+        function startSnake() {
+            if(snakeGameRunning) return;
+            snakeGameRunning = true;
+            const canvas = document.getElementById('snake-canvas');
+            const ctx = canvas.getContext('2d');
+            const box = 15;
+            snake = [{x: 9 * box, y: 10 * box}];
+            food = {x: Math.floor(Math.random() * 19 + 1) * box, y: Math.floor(Math.random() * 19 + 1) * box};
+            snakeDir = 'RIGHT'; snakeScore = 0;
+            document.getElementById('snake-score').textContent = `SCORE: 0`;
+
+            function draw() {
+                if(!snakeGameRunning || isBSODActive) {
+                    snakeGameRunning = false;
+                    return;
+                }
+                ctx.fillStyle = "#f2e8cf"; ctx.fillRect(0,0,canvas.width,canvas.height);
+                for(let i=0; i<snake.length; i++) {
+                    ctx.fillStyle = (i==0) ? "#2b2d42" : "#386641";
+                    ctx.fillRect(snake[i].x, snake[i].y, box, box);
+                }
+                ctx.fillStyle = "#bc4749"; ctx.fillRect(food.x, food.y, box, box);
+                let snakeX = snake[0].x, snakeY = snake[0].y;
+                if(snakeDir == "LEFT") snakeX -= box;
+                if(snakeDir == "UP") snakeY -= box;
+                if(snakeDir == "RIGHT") snakeX += box;
+                if(snakeDir == "DOWN") snakeY += box;
+
+                if(snakeX == food.x && snakeY == food.y) {
+                    snakeScore++; if (snakeGameRunning) beep(600, 20);
+                    globalSnakeScore = snakeScore;
+                    document.getElementById('snake-score').textContent = `SCORE: ${snakeScore}`;
+                    food = {x: Math.floor(Math.random() * 19 + 1) * box, y: Math.floor(Math.random() * 19 + 1) * box};
+                } else { snake.pop(); }
+
+                let newHead = {x: snakeX, y: snakeY};
+                if(snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
+                    snakeGameRunning = false; if (!isBSODActive) beep(100, 200, "sawtooth");
+                    setTimeout(() => { if (!isBSODActive && !document.getElementById('snake-view').classList.contains('hidden')) { snakeGameRunning = false; startSnake(); } }, 1000); return;
+                }
+                snake.unshift(newHead);
+                if (snakeGameRunning) setTimeout(() => requestAnimationFrame(draw), 100);
+            }
+            draw();
+        }
+
+        function collision(head, array) {
+            for(let i=0; i<array.length; i++) if(head.x == array[i].x && head.y == array[i].y) return true;
+            return false;
+        }
+
+        function changeSnakeDir(d) { snakeDir = d; beep(400, 10); }
+        window.addEventListener('keydown', (e) => {
+            if(e.key == "ArrowLeft" && snakeDir != "RIGHT") snakeDir = "LEFT";
+            else if(e.key == "ArrowUp" && snakeDir != "DOWN") snakeDir = "UP";
+            else if(e.key == "ArrowRight" && snakeDir != "LEFT") snakeDir = "RIGHT";
+            else if(e.key == "ArrowDown" && snakeDir != "UP") snakeDir = "DOWN";
+        });
+
+        const questions = [
+            { q: "To start, you need to interact with the system.", answer: "START_CLICKED" },
+            { q: "Determine the current OS environment version.", type: "mc", options: ["v3.1.0", "v3.2.0-STABLE", "v4.0.0", "v9.9.9"], answer: "v3.2.0-STABLE" },
+            { q: "Consult the advisory files to continue.", answer: "RED_TEXT_CLICKED" },
+            { q: "The system feels sluggish. Optimize the process.", answer: "REFRESH_TASK" },
+            { q: "Gaining administrative access is required.", answer: "CMD_OVERRIDE" },
+            { q: "Termination of this session is the final step.", answer: "CLOSE_TRAP" }
+        ];
+
+        function loadQuestion() {
+            const opt = document.getElementById('options');
+            const qNum = document.getElementById('q-num');
+            const qText = document.getElementById('q-text');
+            opt.innerHTML = "";
+
+            if (isEssayMode) {
+                qNum.textContent = "SURVEY_01";
+                qText.textContent = "How can PossibleOS improve to help more consumers such as yourself?";
+                const area = document.createElement('textarea');
+                area.id = "essay-textarea";
+                area.placeholder = "Write your feedback here...";
+                const btn = document.createElement('button');
+                btn.className = "minimalist-button col-span-2";
+                btn.textContent = "SUBMIT FEEDBACK";
+                btn.onclick = () => {
+                    if (area.value.trim().length > 10) {
+                        hideWindow('quiz-window');
+                        const browser = document.getElementById('browser-window');
+                        browser.classList.remove('hidden');
+                        browser.style.zIndex = ++highestZ;
+                        isBrowserUpdated = true;
+                        applyBrowserPatchUI();
+                        navigateBrowser("https://www.possible.com");
+                        updateTaskbar();
+                    } else {
+                        beep(200, 100, "sawtooth");
+                    }
+                };
+                opt.appendChild(area);
+                opt.appendChild(btn);
+                return;
+            }
+
+            const data = questions[currentQ];
+            qNum.textContent = `LOG_0${currentQ + 1}`;
+            const locale = LANG_MAP[vpnLocation] || LANG_MAP["US"];
+            
+            let qTxt = data.q;
+            if (currentQ === 0) {
+                if (window.innerWidth <= 768) {
+                    qTxt = "To start, you need to type 'SYSTEM' in the terminal.";
+                } else {
+                    qTxt = locale.system_booting || "System Booting...";
+                }
+            }
+
+            qText.textContent = qTxt;
+            if(data.type === "mc") {
+                data.options.forEach(o => {
+                    const b = document.createElement('button');
+                    b.className = "minimalist-button"; b.textContent = o;
+                    b.onclick = () => checkAnswer(o); opt.appendChild(b);
+                });
+            }
+        }
+
+        function checkAnswer(val) {
+            if(isBSODActive || isFinalBookSequence) return;
+            if(val === questions[currentQ].answer) triggerSuccess(); 
+            else if (val !== "CLOSE_TRAP") fail();
+        }
+
+        function fail() {
+            lives--; beep(100, 300, "sawtooth");
+            document.getElementById('lives').textContent = "♥".repeat(lives) + "♡".repeat(3-lives);
+            if(lives <= 0) triggerBSOD("LIVES_DEPLETED");
+        }
+
+        function win() {
+            isGameWon = true;
+            document.getElementById('icon-quiz').remove();
+            
+            const locale = LANG_MAP[vpnLocation] || LANG_MAP["US"];
+            document.getElementById('q-text').textContent = "SYSTEM SECURED. CORE COMPLETE.";
+            document.getElementById('options').innerHTML = `<button class="minimalist-button col-span-2 w-full text-center" onclick="handleRestart()">${locale.restart_sys || "RESTART SYSTEM"}</button>`;
+        }
+
+        function updateClock() {
+            const display = document.getElementById('clock-display');
+            const greeting = document.getElementById('greeting-time');
+            const batteryLevel = document.getElementById('battery-level');
+            
+            if (isBrowserUpdated && globalSnakeScore >= 10 && !isFinalBookSequence) {
+                const staticTime = "2:13am, January 6, 2016";
+                display.textContent = "02:13";
+                greeting.textContent = staticTime;
+                batteryLevel.textContent = "42%";
+                return;
+            }
+            const now = new Date();
+            display.textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            greeting.textContent = now.toLocaleTimeString();
+
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(battery => {
+                    batteryLevel.textContent = Math.round(battery.level * 100) + "%";
+                });
+            }
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        document.getElementById('os-start').onclick = () => {
+            if (hasStarvedSnakeError) {
+                toggleWindow('term-window');
+            } else {
+                checkAnswer("START_CLICKED");
+            }
+        };
+        
+        document.getElementById('quiz-close-btn').onclick = () => {
+            if(currentQ === 5) checkAnswer("CLOSE_TRAP");
+            else hideWindow('quiz-window');
+        };
+
+        function initIconPositions() {
+            const icons = document.querySelectorAll('.desktop-icon');
+            const isMobile = window.innerWidth <= 768;
+            const gridX = isMobile ? (window.innerWidth / 3) : 100;
+            const gridY = isMobile ? 120 : 110;
+            const padding = isMobile ? 10 : 20;
+
+            icons.forEach((icon, i) => {
+                icon.style.position = 'absolute';
+                icon.style.margin = '0';
+                if (isMobile) {
+                    const col = i % 3;
+                    const row = Math.floor(i / 3);
+                    icon.style.left = (col * gridX + (gridX - 80) / 2) + 'px';
+                    icon.style.top = (row * gridY + padding) + 'px';
+                } else {
+                    icon.style.left = padding + 'px';
+                    icon.style.top = (padding + (i * gridY)) + 'px';
+                }
+            });
+        }
+
+        function makeIconsDraggable() {
+            const icons = document.querySelectorAll('.desktop-icon');
+            icons.forEach(icon => {
+                let timer;
+                let isDragging = false;
+
+                const startDrag = (e) => {
+                    if (isBSODActive || isFinalBookSequence) return;
+                    const initX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                    const initY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+                    const logic = () => {
+                        isDragging = true;
+                        icon.classList.add('dragging');
+                        icon.style.zIndex = ++highestZ;
+                        let offsetX = initX - icon.getBoundingClientRect().left;
+                        let offsetY = initY - icon.getBoundingClientRect().top;
+
+                        const onMove = (moveEvent) => {
+                            if (!isDragging) return;
+                            const mx = moveEvent.type.includes('touch') ? moveEvent.touches[0].clientX : moveEvent.clientX;
+                            const my = moveEvent.type.includes('touch') ? moveEvent.touches[0].clientY : moveEvent.clientY;
+                            icon.style.left = (mx - offsetX) + "px";
+                            icon.style.top = (my - offsetY) + "px";
+                        };
+
+                        const onEnd = () => {
+                            if (isDragging) {
+                                const isMobile = window.innerWidth <= 768;
+                                const gridX = isMobile ? (window.innerWidth / 3) : 100;
+                                const gridY = isMobile ? 120 : 110;
+                                const currentLeft = parseFloat(icon.style.left);
+                                const currentTop = parseFloat(icon.style.top);
+                                icon.style.left = (Math.round(currentLeft / gridX) * gridX + (isMobile ? (gridX-80)/2 : 20)) + 'px';
+                                icon.style.top = (Math.round(currentTop / gridY) * gridY + (isMobile ? 10 : 20)) + 'px';
+                            }
+                            isDragging = false;
+                            icon.classList.remove('dragging');
+                            document.removeEventListener('mousemove', onMove);
+                            document.removeEventListener('mouseup', onEnd);
+                            document.removeEventListener('touchmove', onMove);
+                            document.removeEventListener('touchend', onEnd);
+                        };
+
+                        document.addEventListener('mousemove', onMove);
+                        document.addEventListener('mouseup', onEnd);
+                        document.addEventListener('touchmove', onMove, {passive: false});
+                        document.addEventListener('touchend', onEnd);
+                    };
+                    timer = setTimeout(logic, 200);
+                };
+                icon.addEventListener('mousedown', startDrag);
+                icon.addEventListener('touchstart', startDrag, {passive: true});
+                icon.addEventListener('mouseup', () => clearTimeout(timer));
+                icon.addEventListener('touchend', () => clearTimeout(timer));
+            });
+        }
+
+        window.onload = () => {
+            initIconPositions();
+            makeIconsDraggable();
+            loadQuestion();
+            changeVPN("US");
+        };
+
+        window.addEventListener('resize', initIconPositions);
+
+    </script>
+</body>
+</html>
